@@ -2,26 +2,35 @@ package fr.zadiho.hepickstudio.olympiade.tasks;
 
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
-import fr.zadiho.hepickstudio.olympiade.utils.ActionBar;
 import fr.zadiho.hepickstudio.olympiade.utils.Chrono;
 import fr.zadiho.hepickstudio.olympiade.utils.Cuboid;
 import fr.zadiho.hepickstudio.olympiade.utils.ItemBuilder;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Strider;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.Objects;
 
 public class RaceTask extends BukkitRunnable implements Listener {
 
     private static int counter = 10;
     public static int time = 0;
+
+    public static void resetRace(){
+        counter = 10;
+        time = 0;
+        GameSettings.getInRace().clear();
+        GameSettings.getRacePodium().clear();
+    }
+
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
@@ -36,6 +45,11 @@ public class RaceTask extends BukkitRunnable implements Listener {
     @Override
     public void run() {
         if (counter == 10) {
+            for(Entity strider : Objects.requireNonNull(Bukkit.getWorld("OlympiadeS3_nether")).getEntities()){
+                if(strider.getType() == EntityType.STRIDER){
+                    strider.remove();
+                }
+            }
             Cuboid.fillStartRace();
             for (Player players : Bukkit.getOnlinePlayers()) {
                 GameSettings.getInRace().put(players, false);

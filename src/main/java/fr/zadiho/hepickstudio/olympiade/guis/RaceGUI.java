@@ -69,7 +69,8 @@ public class RaceGUI implements InventoryProvider {
         ClickableItem reset = ClickableItem.of(new ItemBuilder(Material.REDSTONE)
                 .setName("§8§l§8» §c§lRéinitialiser ! §7(§6Instantané§7)")
                 .toItemStack(), e -> {
-            AdminGUI.SMART_INVENTORY.open(player);
+            RaceTask.resetRace();
+            player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
         });
 
 

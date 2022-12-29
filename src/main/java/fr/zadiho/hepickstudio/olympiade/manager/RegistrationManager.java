@@ -13,17 +13,18 @@ import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class RegistrationManager {
 
     Olympiade main = Olympiade.getInstance();
 
-    private List<Listener> listeners = new ArrayList<>();
+    private final List<Listener> listeners = new ArrayList<>();
 
     public void registration(){
 
-        main.getCommand("game").setExecutor(new GameCommand());
-        main.getCommand("host").setExecutor(new HostCommand());
+        Objects.requireNonNull(main.getCommand("game")).setExecutor(new GameCommand());
+        Objects.requireNonNull(main.getCommand("host")).setExecutor(new HostCommand());
 
         this.listeners.add(new PlayerJoin());
         this.listeners.add(new PlayerQuit());
