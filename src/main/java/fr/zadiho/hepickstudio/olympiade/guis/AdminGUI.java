@@ -47,6 +47,7 @@ public class AdminGUI implements InventoryProvider {
                 .addLoreLine("§8§m-----------------------")
                 .toItemStack(), e -> {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+            JumpGUI.INVENTORY.open(player);
         });
 
         ClickableItem race = ClickableItem.of(new ItemBuilder(Material.WARPED_FUNGUS_ON_A_STICK)

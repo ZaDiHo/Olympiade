@@ -8,7 +8,6 @@ import fr.zadiho.hepickstudio.olympiade.utils.ItemBuilder;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Strider;
@@ -16,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.spigotmc.event.entity.EntityDismountEvent;
 
 import java.util.Objects;
 
@@ -31,6 +31,10 @@ public class RaceTask extends BukkitRunnable implements Listener {
         GameSettings.getRacePodium().clear();
     }
 
+    @EventHandler
+    public void onDismount(EntityDismountEvent event){
+        event.setCancelled(true);
+    }
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
@@ -45,11 +49,6 @@ public class RaceTask extends BukkitRunnable implements Listener {
     @Override
     public void run() {
         if (counter == 10) {
-            for(Entity strider : Objects.requireNonNull(Bukkit.getWorld("OlympiadeS3_nether")).getEntities()){
-                if(strider.getType() == EntityType.STRIDER){
-                    strider.remove();
-                }
-            }
             Cuboid.fillStartRace();
             for (Player players : Bukkit.getOnlinePlayers()) {
                 GameSettings.getInRace().put(players, false);
@@ -109,6 +108,7 @@ public class RaceTask extends BukkitRunnable implements Listener {
                         GameSettings.getInRace().remove(players);
                         GameSettings.getRacePodium().put(players, GameSettings.getRacePodium().size() + 1);
                         Bukkit.broadcastMessage("§a" + players.getName() + " §6a terminé la course à la position §e" + GameSettings.getRacePodium().get(players) + " §6! Son chronomètre affichait §e" + Chrono.format(time));
+                        Objects.requireNonNull(players.getVehicle()).remove();
                         players.setGameMode(GameMode.SPECTATOR);
                     }
                     GameSettings.getInRace().put(players, true);

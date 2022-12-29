@@ -30,6 +30,14 @@ public class JumpTask extends BukkitRunnable implements Listener {
     private static HashMap<Player, Integer> checkPoints = new HashMap<>();
     private static HashMap<Player, Boolean> hidePlayer = new HashMap<>();
 
+    public static void resetRace(){
+        counter = 10;
+        time = 0;
+        GameSettings.getJumpPodium().clear();
+        GameSettings.getInJump().clear();
+        checkPoints.clear();
+        hidePlayer.clear();
+    }
 
     private static void resetCheckpoint(Player player) {
         if(checkPoints.get(player) == 1){
@@ -57,6 +65,7 @@ public class JumpTask extends BukkitRunnable implements Listener {
         }
         if(player.getItemInHand().getItemMeta().getDisplayName().equals("§6Retour au checkpoint")){
             resetCheckpoint(player);
+            player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1, 1);
         }
         if(player.getItemInHand().getItemMeta().getDisplayName().equals("§6Masquer les joueurs")){
             if(hidePlayer.get(player)){

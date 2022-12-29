@@ -45,9 +45,6 @@ public class GameCommand implements CommandExecutor {
                     JumpTask jumpTask = new JumpTask();
                     jumpTask.runTaskTimer(Olympiade.getInstance(), 0, 20);
                 }
-                if(args[0].equalsIgnoreCase("gui")){
-                    AdminGUI.SMART_INVENTORY.open(player);
-                }
             }else{
                 player.sendMessage(GameSettings.prefix + ChatColor.translateAlternateColorCodes('&', "§cVous n'avez pas la permission d'utiliser cette commande !"));
                 player.sendTitle(ChatColor.translateAlternateColorCodes('&', "§cErreur !"), ChatColor.translateAlternateColorCodes('&', "§ePermission requise..."), 10, 40, 10);

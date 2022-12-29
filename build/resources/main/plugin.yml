@@ -17,3 +17,9 @@ commands:
     usage: /host pseudo
     aliases:
       - h
+  spawn:
+    description: Commande de téléportation au spawn.
+    usage: /spawn
+    aliases:
+      - lobby
+      - hub
