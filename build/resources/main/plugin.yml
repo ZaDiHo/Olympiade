@@ -1,0 +1,19 @@
+name: Olympiade
+version: '1.0'
+main: fr.zadiho.hepickstudio.olympiade.Olympiade
+api-version: 1.19
+authors: [ ZaDiHo ]
+description: Plugins événementiel Olympiade Saison III regroupant différentes épreuves.
+depend:
+  - LuckPerms
+
+commands:
+  game:
+    description: Commande principale du plugin.
+    usage: /game <jump|race|pvp>
+    aliases: [épreuve]
+  host:
+    description: Commande des organisateurs.
+    usage: /host pseudo
+    aliases:
+      - h
