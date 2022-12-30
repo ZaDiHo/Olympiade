@@ -19,6 +19,7 @@ public class GameSettings {
     public static String prefix = ChatColor.translateAlternateColorCodes('&', "§cOlympiade III §8» ");
     private static int parkour = 20;
     private static int race = 5;
+    private static int tnt = 10;
     private static int pvp = 15;
     public static Location spawnNether = new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1336.5, 75, 24.5, -90, 0);
     public static Location podium1 = new Location(Bukkit.getWorld("OlympiadeS3"), -466.5, 69, -1242.5, 90, 0);
@@ -29,16 +30,25 @@ public class GameSettings {
     private static ArrayList<Player> hostPlayers = new ArrayList<>();
     private static HashMap<Player, Boolean> inRace = new HashMap<>();
     private static HashMap<Player, Boolean> inJump = new HashMap<>();
+    private static HashMap<Player, Boolean> inTNT = new HashMap<>();
     private static HashMap<Player, Integer> racePodium = new HashMap<>();
+    private static HashMap<Player, Integer> tntPodium = new HashMap<>();
     private static HashMap<Player, Integer> jumpPodium = new HashMap<>();
     private static Iterator gamePlayersIterator;
 
+    public static HashMap<Player, Boolean> getInTNT() {
+        return inTNT;
+    }
 
     public static Cuboid endRace = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -754.5, 40, 187.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -762.5, 55.5, 194.5));
     public static final Location spawn = new Location(Bukkit.getWorld("OlympiadeS3"), -522.5, 71, -1242.5, -90, 0);
 
     public static HashMap<Player, Integer> getRacePodium() {
         return racePodium;
+    }
+
+    public static HashMap<Player, Integer> getTntPodium() {
+        return tntPodium;
     }
 
     public static HashMap<Player, Integer> getJumpPodium() {
@@ -65,6 +75,10 @@ public class GameSettings {
     public static int getParkourDuration() {
         return parkour;
     }
+    public static int getTntDuration() {
+        return tnt;
+    }
+
 
     public static int setParkourDuration(int duration) {
         return parkour = duration;

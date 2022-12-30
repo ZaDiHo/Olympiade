@@ -54,9 +54,20 @@ public class JumpGUI implements InventoryProvider {
                 .setName("§8§l§8» §a§lC'est parti !")
                 .toItemStack(), e -> {
             AdminGUI.SMART_INVENTORY.open(player);
-            EGames.setState(EGames.PARKOUR);
-            JumpTask jumpTask = new JumpTask();
-            jumpTask.runTaskTimer(Olympiade.getInstance(), 0, 20);
+            if(JumpTask.isPlayed() || EGames.getCurrentState().equals(EGames.PARKOUR)){
+                if(JumpTask.isPlayed()){
+                    player.sendMessage("§cL'épreuve à déjà été faite, vous pouvez cependant la réinitialiser.");
+                }
+                if(EGames.getCurrentState().equals(EGames.PARKOUR)){
+                    player.sendMessage("§cL'épreuve est déjà en cours !");
+                }
+                player.closeInventory();
+                player.playSound(player.getLocation(), Sound.ENTITY_CAT_HISS, 1, 1);
+            }else{
+                EGames.setState(EGames.PARKOUR);
+                JumpTask jumpTask = new JumpTask();
+                jumpTask.runTaskTimer(Olympiade.getInstance(), 0, 20);
+            }
         });
 
         ClickableItem rules = ClickableItem.of(new ItemBuilder(Material.BLAZE_POWDER)

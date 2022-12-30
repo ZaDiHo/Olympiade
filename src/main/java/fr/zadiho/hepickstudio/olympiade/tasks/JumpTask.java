@@ -21,6 +21,7 @@ import java.util.HashMap;
 public class JumpTask extends BukkitRunnable implements Listener {
 
     private static int counter = 10;
+    public static boolean played = false;
     public static int time = 0;
 
     private static Cuboid endJump = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1003.5, 73.5, -1.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -997.5, 67, 10.5));
@@ -31,6 +32,7 @@ public class JumpTask extends BukkitRunnable implements Listener {
     private static HashMap<Player, Boolean> hidePlayer = new HashMap<>();
 
     public static void resetRace(){
+        setPlayed(false);
         counter = 10;
         time = 0;
         GameSettings.getJumpPodium().clear();
@@ -89,6 +91,14 @@ public class JumpTask extends BukkitRunnable implements Listener {
             }
 
         }
+    }
+
+    public static boolean isPlayed() {
+        return played;
+    }
+
+    public static void setPlayed(boolean played) {
+        JumpTask.played = played;
     }
 
     @EventHandler
@@ -189,6 +199,8 @@ public class JumpTask extends BukkitRunnable implements Listener {
                     players.getInventory().clear();
                     GameSettings.teleportPodium(EGames.PARKOUR);
                     EGames.setState(EGames.WAITING);
+                    setPlayed(true);
+                    Cuboid.fillStartJump();
                 }
                 cancel();
             }
@@ -199,6 +211,8 @@ public class JumpTask extends BukkitRunnable implements Listener {
                     players.getInventory().clear();
                     players.teleport(GameSettings.spawn);
                     EGames.setState(EGames.WAITING);
+                    setPlayed(true);
+                    Cuboid.fillStartJump();
                 }
                 cancel();
             }

@@ -2,8 +2,11 @@ package fr.zadiho.hepickstudio.olympiade;
 
 import fr.minuskube.inv.InventoryManager;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
+import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
 import fr.zadiho.hepickstudio.olympiade.manager.RegistrationManager;
 import fr.zadiho.hepickstudio.olympiade.tasks.OlympiadeTask;
+import fr.zadiho.hepickstudio.olympiade.utils.Cuboid;
+import fr.zadiho.hepickstudio.olympiade.utils.Holograms;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -42,6 +45,11 @@ public final class Olympiade extends JavaPlugin {
 
         }
 
+        Holograms.clearHolograms();
+        Holograms.setupHolograms();
+        Cuboid.fillStartJump();
+        Cuboid.fillStartRace();
+
         EGames.setState(EGames.WAITING);
         RegistrationManager registrationManager = new RegistrationManager();
         registrationManager.registration();
@@ -65,6 +73,7 @@ public final class Olympiade extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        Holograms.clearHolograms();
         super.onDisable();
     }
 

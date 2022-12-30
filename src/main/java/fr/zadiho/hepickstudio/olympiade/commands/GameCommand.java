@@ -6,6 +6,7 @@ import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
 import fr.zadiho.hepickstudio.olympiade.guis.AdminGUI;
 import fr.zadiho.hepickstudio.olympiade.tasks.JumpTask;
 import fr.zadiho.hepickstudio.olympiade.tasks.RaceTask;
+import fr.zadiho.hepickstudio.olympiade.tasks.TNTTask;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
@@ -44,6 +45,11 @@ public class GameCommand implements CommandExecutor {
                     EGames.setState(EGames.PARKOUR);
                     JumpTask jumpTask = new JumpTask();
                     jumpTask.runTaskTimer(Olympiade.getInstance(), 0, 20);
+                }
+                if(args[0].equalsIgnoreCase("tnt")){
+                    EGames.setState(EGames.TNT);
+                    TNTTask tntTask = new TNTTask();
+                    tntTask.runTaskTimer(Olympiade.getInstance(), 0, 20);
                 }
             }else{
                 player.sendMessage(GameSettings.prefix + ChatColor.translateAlternateColorCodes('&', "§cVous n'avez pas la permission d'utiliser cette commande !"));

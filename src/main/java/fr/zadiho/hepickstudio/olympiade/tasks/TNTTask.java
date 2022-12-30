@@ -1,5 +1,6 @@
 package fr.zadiho.hepickstudio.olympiade.tasks;
 
+import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
 import fr.zadiho.hepickstudio.olympiade.utils.Chrono;
@@ -8,66 +9,76 @@ import fr.zadiho.hepickstudio.olympiade.utils.ItemBuilder;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
-import org.bukkit.entity.EntityType;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Strider;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.spigotmc.event.entity.EntityDismountEvent;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-public class RaceTask extends BukkitRunnable implements Listener {
+public class TNTTask extends BukkitRunnable implements Listener {
 
     private static int counter = 10;
-    public static int time = 0;
     public static boolean played = false;
+    public static int time = 0;
+
+    private static ArrayList<Player> alives = new ArrayList<>();
+
+    private static Cuboid arena = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -223.5, -61.5, -798.5), new Location(Bukkit.getWorld("OlympiadeS3"), -167.5, 71, -853.5));
+    private static Cuboid endTNT = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -218.5, -53.5, -803.5), new Location(Bukkit.getWorld("OlympiadeS3"), -169.5, -52.5, -850.5));
 
     public static void resetRace(){
         setPlayed(false);
         counter = 10;
         time = 0;
-        GameSettings.getInRace().clear();
-        GameSettings.getRacePodium().clear();
+        GameSettings.getTntPodium().clear();
+        GameSettings.getInTNT().clear();
     }
+
 
     public static boolean isPlayed() {
         return played;
     }
 
     public static void setPlayed(boolean played) {
-        RaceTask.played = played;
-    }
-
-    @EventHandler
-    public void onDismount(EntityDismountEvent event){
-        event.setCancelled(true);
+        TNTTask.played = played;
     }
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
-        if (event.getEntityType() == EntityType.STRIDER) {
-            event.setCancelled(true);
-        }
-        if (event.getEntityType() == EntityType.PLAYER) {
-            event.setCancelled(true);
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent event){
+        Player player = event.getPlayer();
+        if(counter<0){
+            if(EGames.getCurrentState().equals(EGames.TNT) && arena.isIn(player)){
+                if(player.getWorld().getBlockAt(player.getLocation().subtract(0, 1, 0)).getType().equals(Material.GOLD_BLOCK)){
+                    Block block = player.getWorld().getBlockAt(player.getLocation().subtract(0, 1, 0));
+                    block.setType(Material.DIAMOND_BLOCK);
+                    Bukkit.getScheduler().runTaskLater(Olympiade.getInstance(), () -> {
+                        block.setType(Material.AIR);
+                    }, 20);
+                }
+            }
         }
     }
 
     @Override
     public void run() {
         if (counter == 10) {
-            Cuboid.fillStartRace();
+            Cuboid.fillStartJump();
             for (Player players : Bukkit.getOnlinePlayers()) {
-                GameSettings.getInRace().put(players, false);
-                players.teleport(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -882.7, 91.5, 57.0, 90, 0));
+                alives.add(players);
+                GameSettings.getInTNT().put(players, false);
+                players.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -195.5, 44.5, -825.5));
                 players.sendTitle("§cAttention !", "§6Placez vous devant la ligne de départ !", 10, 20, 10);
-                Strider monture = (Strider) players.getWorld().spawnEntity(players.getLocation(), EntityType.STRIDER);
-                monture.setSaddle(true);
-                monture.addPassenger(players);
-                players.getInventory().setItem(4, new ItemBuilder(Material.WARPED_FUNGUS_ON_A_STICK).setName("§6Bâton de course").toItemStack());
             }
         }
         if (counter == 5) {
@@ -103,7 +114,6 @@ public class RaceTask extends BukkitRunnable implements Listener {
         if (counter == 0) {
             for (Player players : Bukkit.getOnlinePlayers()) {
                 players.playSound(players.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-                Cuboid.clearStartRace();
             }
 
         }
@@ -112,40 +122,38 @@ public class RaceTask extends BukkitRunnable implements Listener {
                 if (players.isVisualFire()) {
                     players.setVisualFire(false);
                 }
-                players.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§6Chronomètre: §e" + Chrono.format(time)));
-                if (GameSettings.endRace.isIn(players)) {
-                    if (!GameSettings.getInRace().get(players)) {
-                        GameSettings.getInRace().remove(players);
-                        GameSettings.getRacePodium().put(players, GameSettings.getRacePodium().size() + 1);
-                        Bukkit.broadcastMessage("§a" + players.getName() + " §6a terminé la course à la position §e" + GameSettings.getRacePodium().get(players) + " §6! Son chronomètre affichait §e" + Chrono.format(time));
-                        Objects.requireNonNull(players.getVehicle()).remove();
+
+                if (endTNT.isIn(players)) {
+                    if (!GameSettings.getInTNT().get(players)) {
+                        GameSettings.getInTNT().remove(players);
+                        GameSettings.getTntPodium().put(players, GameSettings.getJumpPodium().size() + 1);
+                        alives.remove(players);
+                        Bukkit.broadcastMessage("§a" + players.getName() + " §6est mort" + GameSettings.getJumpPodium().get(players) + " §6! Son chronomètre affichait §e");
                         players.setGameMode(GameMode.SPECTATOR);
                     }
-                    GameSettings.getInRace().put(players, true);
+                    GameSettings.getInTNT().put(players, true);
                 }
             }
-            if(GameSettings.getGamePlayers().size() == GameSettings.getRacePodium().size()){
+
+            if(alives.size() == 1){
                 for (Player players : GameSettings.getGamePlayers()) {
-                    players.sendTitle("§cCourse terminée !", "§6Le parcours est terminé !", 10, 20, 10);
+                    players.sendTitle("§cParcours terminée !", "§6Le parcours est terminé !", 10, 20, 10);
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
-                    players.setGameMode(GameMode.SURVIVAL);
-                    GameSettings.teleportPodium(EGames.RACE);
+                    GameSettings.teleportPodium(EGames.PARKOUR);
                     EGames.setState(EGames.WAITING);
                     setPlayed(true);
-                    Cuboid.fillStartRace();
                 }
                 cancel();
             }
-            if (time / 60 >= GameSettings.getRaceDuration()) {
+            if (time / 60 >= GameSettings.getTntDuration()) {
                 for (Player players : GameSettings.getGamePlayers()) {
-                    players.sendTitle("§cTemps écoulé !", "§6La course est terminée !", 10, 20, 10);
+                    players.sendTitle("§cTemps écoulé !", "§6Le parcours est terminé !", 10, 20, 10);
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
                     players.teleport(GameSettings.spawn);
                     EGames.setState(EGames.WAITING);
                     setPlayed(true);
-                    Cuboid.fillStartRace();
                 }
                 cancel();
             }

@@ -46,7 +46,7 @@ public class OlympiadeTask extends BukkitRunnable implements Listener {
     @Override
     public void run() {
         for(Player players : GameSettings.getGamePlayers()){
-            if(EGames.getCurrentState() == EGames.WAITING){
+            if(EGames.getCurrentState() == EGames.WAITING && !(GameSettings.getHostPlayers().contains(players))){
                 if(!(players.getGameMode() == GameMode.ADVENTURE)){
                     players.setGameMode(GameMode.ADVENTURE);
                 }

@@ -7,6 +7,7 @@ import fr.minuskube.inv.content.InventoryProvider;
 import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
+import fr.zadiho.hepickstudio.olympiade.tasks.JumpTask;
 import fr.zadiho.hepickstudio.olympiade.tasks.RaceTask;
 import fr.zadiho.hepickstudio.olympiade.utils.ItemBuilder;
 import org.bukkit.*;
@@ -51,9 +52,20 @@ public class RaceGUI implements InventoryProvider {
                 .setName("§8§l§8» §a§lC'est parti !")
                 .toItemStack(), e -> {
             AdminGUI.SMART_INVENTORY.open(player);
-            EGames.setState(EGames.RACE);
-            RaceTask raceTask = new RaceTask();
-            raceTask.runTaskTimer(Olympiade.getInstance(), 0, 20);
+            if(RaceTask.isPlayed() || EGames.getCurrentState().equals(EGames.RACE)){
+                if(RaceTask.isPlayed()){
+                    player.sendMessage("§cL'épreuve à déjà été faite, vous pouvez cependant la réinitialiser.");
+                }
+                if(EGames.getCurrentState().equals(EGames.RACE)){
+                    player.sendMessage("§cL'épreuve est déjà en cours !");
+                }
+                player.closeInventory();
+                player.playSound(player.getLocation(), Sound.ENTITY_CAT_HISS, 1, 1);
+            }else{
+                EGames.setState(EGames.RACE);
+                RaceTask raceTask = new RaceTask();
+                raceTask.runTaskTimer(Olympiade.getInstance(), 0, 20);
+            }
         });
 
         ClickableItem rules = ClickableItem.of(new ItemBuilder(Material.BLAZE_POWDER)
