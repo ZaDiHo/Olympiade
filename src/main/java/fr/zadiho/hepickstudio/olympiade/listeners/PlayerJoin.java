@@ -30,6 +30,7 @@ public class PlayerJoin implements Listener {
             if(player.hasPermission("olympiade.staff")){
                 player.setAllowFlight(true);
             }
+            player.playSound(player.getLocation(), Sound.MUSIC_DISC_11, 1, 1);
             PlayerManager.registerPlayer(player);
         }
 

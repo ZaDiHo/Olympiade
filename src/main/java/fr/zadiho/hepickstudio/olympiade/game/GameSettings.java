@@ -18,7 +18,7 @@ public class GameSettings {
 
     public static String prefix = ChatColor.translateAlternateColorCodes('&', "§cOlympiade III §8» ");
     private static int parkour = 20;
-    private static int race = 5;
+    private static int race = 10;
     private static int tnt = 10;
     private static int pvp = 15;
     public static Location spawnNether = new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1336.5, 75, 24.5, -90, 0);
@@ -40,7 +40,6 @@ public class GameSettings {
         return inTNT;
     }
 
-    public static Cuboid endRace = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -754.5, 40, 187.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -762.5, 55.5, 194.5));
     public static final Location spawn = new Location(Bukkit.getWorld("OlympiadeS3"), -522.5, 71, -1242.5, -90, 0);
 
     public static HashMap<Player, Integer> getRacePodium() {

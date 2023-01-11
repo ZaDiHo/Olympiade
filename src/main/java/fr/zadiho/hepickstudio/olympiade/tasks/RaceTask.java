@@ -21,6 +21,10 @@ import java.util.Objects;
 
 public class RaceTask extends BukkitRunnable implements Listener {
 
+
+    private static Cuboid portal1 = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -754.5, 40, 187.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -762.5, 55.5, 194.5));
+    private static Cuboid portal2 = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -656, 69, 222.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -662.5, 83, 225.5));
+    public static Cuboid endRace = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -564.5, 45, 270.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -570.5, 30, 277.5));
     private static int counter = 10;
     public static int time = 0;
     public static boolean played = false;
@@ -61,6 +65,7 @@ public class RaceTask extends BukkitRunnable implements Listener {
         if (counter == 10) {
             Cuboid.fillStartRace();
             for (Player players : Bukkit.getOnlinePlayers()) {
+                players.stopAllSounds();
                 GameSettings.getInRace().put(players, false);
                 players.teleport(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -882.7, 91.5, 57.0, 90, 0));
                 players.sendTitle("§cAttention !", "§6Placez vous devant la ligne de départ !", 10, 20, 10);
@@ -113,7 +118,21 @@ public class RaceTask extends BukkitRunnable implements Listener {
                     players.setVisualFire(false);
                 }
                 players.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§6Chronomètre: §e" + Chrono.format(time)));
-                if (GameSettings.endRace.isIn(players)) {
+                if(portal1.isIn(players)){
+                    Objects.requireNonNull(players.getVehicle()).remove();
+                    players.teleport(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -762.5, 77, 187.5, -160, 0));
+                    Strider monture = (Strider) players.getWorld().spawnEntity(players.getLocation(), EntityType.STRIDER);
+                    monture.setSaddle(true);
+                    monture.addPassenger(players);
+                }
+                if(portal2.isIn(players)){
+                    Objects.requireNonNull(players.getVehicle()).remove();
+                    players.teleport(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -650, 76, 272.5, -90, 0));
+                    Strider monture = (Strider) players.getWorld().spawnEntity(players.getLocation(), EntityType.STRIDER);
+                    monture.setSaddle(true);
+                    monture.addPassenger(players);
+                }
+                if (endRace.isIn(players)) {
                     if (!GameSettings.getInRace().get(players)) {
                         GameSettings.getInRace().remove(players);
                         GameSettings.getRacePodium().put(players, GameSettings.getRacePodium().size() + 1);

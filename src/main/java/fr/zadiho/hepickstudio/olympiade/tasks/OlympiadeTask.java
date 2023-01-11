@@ -117,6 +117,20 @@ public class OlympiadeTask extends BukkitRunnable implements Listener {
                         "§6play.olympiade.fr"
                 );
             }
+            if (EGames.getCurrentState() == EGames.TNT) {
+                board.updateTitle("§c§nOlympiade III");
+                board.updateLines(
+                        "§7§m------------------", // Empty line
+                        "§8■ §fCompte §7➢ §6" + players.getName(),
+                        "§8■ §fPoints §7➢ §6" + GameSettings.getPodium().get(players),
+                        "",
+                        "§8■ §fÉpreuve §7➢ §cTnt Run",
+                        "§8■ §fVivants §7➢ §e" + TNTTask.alives.size(),
+                        "§8■ §fJoueurs §7➢ §e" + GameSettings.getGamePlayers().size(),
+                        "§7§m------------------",
+                        "§6play.olympiade.fr"
+                );
+            }
         }
     }
 }

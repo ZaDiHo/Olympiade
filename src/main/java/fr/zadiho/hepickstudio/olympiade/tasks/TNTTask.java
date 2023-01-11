@@ -27,10 +27,11 @@ public class TNTTask extends BukkitRunnable implements Listener {
     public static boolean played = false;
     public static int time = 0;
 
-    private static ArrayList<Player> alives = new ArrayList<>();
+    public static ArrayList<Player> alives = new ArrayList<>();
+    private static HashMap<Player, Integer> podium = new HashMap();
 
     private static Cuboid arena = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -223.5, -61.5, -798.5), new Location(Bukkit.getWorld("OlympiadeS3"), -167.5, 71, -853.5));
-    private static Cuboid endTNT = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -218.5, -53.5, -803.5), new Location(Bukkit.getWorld("OlympiadeS3"), -169.5, -52.5, -850.5));
+    private static Cuboid endTNT = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -171.5, -61, -802), new Location(Bukkit.getWorld("OlympiadeS3"), -221.5, -52.5, -851.5));
 
     public static void resetRace(){
         setPlayed(false);
@@ -59,12 +60,14 @@ public class TNTTask extends BukkitRunnable implements Listener {
         Player player = event.getPlayer();
         if(counter<0){
             if(EGames.getCurrentState().equals(EGames.TNT) && arena.isIn(player)){
-                if(player.getWorld().getBlockAt(player.getLocation().subtract(0, 1, 0)).getType().equals(Material.GOLD_BLOCK)){
-                    Block block = player.getWorld().getBlockAt(player.getLocation().subtract(0, 1, 0));
-                    block.setType(Material.DIAMOND_BLOCK);
-                    Bukkit.getScheduler().runTaskLater(Olympiade.getInstance(), () -> {
-                        block.setType(Material.AIR);
-                    }, 20);
+                if(alives.contains(player)){
+                    if(player.getWorld().getBlockAt(player.getLocation().subtract(0, 1, 0)).getType().equals(Material.GOLD_BLOCK)){
+                        Block block = player.getWorld().getBlockAt(player.getLocation().subtract(0, 1, 0));
+                        block.setType(Material.DIAMOND_BLOCK);
+                        Bukkit.getScheduler().runTaskLater(Olympiade.getInstance(), () -> {
+                            block.setType(Material.AIR);
+                        }, 10);
+                    }
                 }
             }
         }
@@ -75,6 +78,7 @@ public class TNTTask extends BukkitRunnable implements Listener {
         if (counter == 10) {
             Cuboid.fillStartJump();
             for (Player players : Bukkit.getOnlinePlayers()) {
+                players.stopAllSounds();
                 alives.add(players);
                 GameSettings.getInTNT().put(players, false);
                 players.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -195.5, 44.5, -825.5));
@@ -128,7 +132,7 @@ public class TNTTask extends BukkitRunnable implements Listener {
                         GameSettings.getInTNT().remove(players);
                         GameSettings.getTntPodium().put(players, GameSettings.getJumpPodium().size() + 1);
                         alives.remove(players);
-                        Bukkit.broadcastMessage("§a" + players.getName() + " §6est mort" + GameSettings.getJumpPodium().get(players) + " §6! Son chronomètre affichait §e");
+                        Bukkit.broadcastMessage("§a" + players.getName() + " §6est mort ! §7(§c" + alives.size() + "§8/§e" + GameSettings.getGamePlayers().size() + "§7)");
                         players.setGameMode(GameMode.SPECTATOR);
                     }
                     GameSettings.getInTNT().put(players, true);
@@ -137,10 +141,13 @@ public class TNTTask extends BukkitRunnable implements Listener {
 
             if(alives.size() == 1){
                 for (Player players : GameSettings.getGamePlayers()) {
-                    players.sendTitle("§cParcours terminée !", "§6Le parcours est terminé !", 10, 20, 10);
+                    players.sendTitle("§cTntRun terminé !", "§6Victoire de §e" + alives.get(0).getDisplayName(), 10, 100, 10);
+                    WinFireworks.setWinner(alives.get(0));
+                    WinFireworks winFireworks = new WinFireworks();
+                    winFireworks.runTaskTimer(Olympiade.getInstance(), 0, 20);
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
-                    GameSettings.teleportPodium(EGames.PARKOUR);
+                    GameSettings.teleportPodium(EGames.TNT);
                     EGames.setState(EGames.WAITING);
                     setPlayed(true);
                 }
@@ -148,7 +155,7 @@ public class TNTTask extends BukkitRunnable implements Listener {
             }
             if (time / 60 >= GameSettings.getTntDuration()) {
                 for (Player players : GameSettings.getGamePlayers()) {
-                    players.sendTitle("§cTemps écoulé !", "§6Le parcours est terminé !", 10, 20, 10);
+                    players.sendTitle("§cTemps écoulé !", "§6Le parcours est terminé !", 10, 100, 10);
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
                     players.teleport(GameSettings.spawn);

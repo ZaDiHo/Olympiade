@@ -111,6 +111,7 @@ public class JumpTask extends BukkitRunnable implements Listener {
         if (counter == 10) {
             Cuboid.fillStartJump();
             for (Player players : Bukkit.getOnlinePlayers()) {
+                players.stopAllSounds();
                 hidePlayer.put(players, false);
                 GameSettings.getInJump().put(players, false);
                 checkPoints.put(players, 1);
@@ -194,7 +195,7 @@ public class JumpTask extends BukkitRunnable implements Listener {
             }
             if(GameSettings.getGamePlayers().size() == GameSettings.getJumpPodium().size()){
                 for (Player players : GameSettings.getGamePlayers()) {
-                    players.sendTitle("§cParcours terminée !", "§6Le parcours est terminé !", 10, 20, 10);
+                    players.sendTitle("§cTout le monde à terminé !", "§6Le parcours est terminé !", 10, 20, 10);
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
                     GameSettings.teleportPodium(EGames.PARKOUR);

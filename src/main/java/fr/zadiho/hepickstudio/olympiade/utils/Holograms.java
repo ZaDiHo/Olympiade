@@ -20,7 +20,7 @@ public class Holograms {
 
     public static void setupHolograms(){
         createHologram("§e§l⟺ §6Direction §e§l⟺", new Location(Bukkit.getWorld("OlympiadeS3_nether"), -885.5, 76, 135.5));
-        createHologram("§e§l⟹ §6Direction §e§l⟹", new Location(Bukkit.getWorld("OlympiadeS3_nether"), -779.5, 45, 157.5));
+        createHologram("§e§l⟹ §6Direction §e§l⟹", new Location(Bukkit.getWorld("OlympiadeS3_nether"), -790.5, 44, 157.5));
         createHologram("§e§l⟺ §6Direction §e§l⟺", new Location(Bukkit.getWorld("OlympiadeS3_nether"), -728, 78, 170.5));
         createHologram("§e§l⟸ §6Direction §e§l⟸", new Location(Bukkit.getWorld("OlympiadeS3_nether"), -681, 75, 183.5));
     }
