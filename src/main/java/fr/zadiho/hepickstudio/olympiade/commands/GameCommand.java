@@ -7,7 +7,9 @@ import fr.zadiho.hepickstudio.olympiade.guis.AdminGUI;
 import fr.zadiho.hepickstudio.olympiade.tasks.JumpTask;
 import fr.zadiho.hepickstudio.olympiade.tasks.RaceTask;
 import fr.zadiho.hepickstudio.olympiade.tasks.TNTTask;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -50,6 +52,9 @@ public class GameCommand implements CommandExecutor {
                     EGames.setState(EGames.TNT);
                     TNTTask tntTask = new TNTTask();
                     tntTask.runTaskTimer(Olympiade.getInstance(), 0, 20);
+                }
+                if(args[0].equalsIgnoreCase("test")){
+                    player.teleport(new Location(Bukkit.getWorld("uhcrun"), 100, 0 ,100));
                 }
             }else{
                 player.sendMessage(GameSettings.prefix + ChatColor.translateAlternateColorCodes('&', "§cVous n'avez pas la permission d'utiliser cette commande !"));

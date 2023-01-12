@@ -20,6 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class TNTTask extends BukkitRunnable implements Listener {
 
@@ -30,15 +31,55 @@ public class TNTTask extends BukkitRunnable implements Listener {
     public static ArrayList<Player> alives = new ArrayList<>();
     private static HashMap<Player, Integer> podium = new HashMap();
 
-    private static Cuboid arena = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -223.5, -61.5, -798.5), new Location(Bukkit.getWorld("OlympiadeS3"), -167.5, 71, -853.5));
+    private static Cuboid arena = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -217.5, -55.5, -803.5), new Location(Bukkit.getWorld("OlympiadeS3"), -172.5, 71, -847));
     private static Cuboid endTNT = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -171.5, -61, -802), new Location(Bukkit.getWorld("OlympiadeS3"), -221.5, -52.5, -851.5));
+    //Iron blocks
+    private static Cuboid floor1 = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -216.5, 43, -804), new Location(Bukkit.getWorld("OlympiadeS3"), -173.5, 43, -847.5));
+    //Moss blocks
+    private static Cuboid floor2 = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -174, 25, -805), new Location(Bukkit.getWorld("OlympiadeS3"), -217, 25, -848));
+    //Dripstone blocks
+    private static Cuboid floor3 = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -217, 7, -848), new Location(Bukkit.getWorld("OlympiadeS3"), -174, 7, -805));
+    //deepslate
+    private static Cuboid floor4 = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -174, -12, -805), new Location(Bukkit.getWorld("OlympiadeS3"), -217, -12, -848));
+    //sculk sensor
+    private static Cuboid floor5 = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -217, -31, -848), new Location(Bukkit.getWorld("OlympiadeS3"), -174, -31, -805));
+    //red glass
+    private static Cuboid floor6 = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -174, -50, -805), new Location(Bukkit.getWorld("OlympiadeS3"), -217, -50, -848));
 
-    public static void resetRace(){
+    public static void fillFloors() {
+        for (Iterator<Block> it = floor1.blockList(); it.hasNext(); ) {
+            Block block = it.next();
+            block.setType(Material.IRON_BLOCK);
+        }
+        for (Iterator<Block> it = floor2.blockList(); it.hasNext(); ) {
+            Block block = it.next();
+            block.setType(Material.MOSS_BLOCK);
+        }
+        for (Iterator<Block> it = floor3.blockList(); it.hasNext(); ) {
+            Block block = it.next();
+            block.setType(Material.DRIPSTONE_BLOCK);
+        }
+        for (Iterator<Block> it = floor4.blockList(); it.hasNext(); ) {
+            Block block = it.next();
+            block.setType(Material.DEEPSLATE);
+        }
+        for (Iterator<Block> it = floor5.blockList(); it.hasNext(); ) {
+            Block block = it.next();
+            block.setType(Material.SCULK_SENSOR);
+        }
+        for (Iterator<Block> it = floor6.blockList(); it.hasNext(); ) {
+            Block block = it.next();
+            block.setType(Material.RED_STAINED_GLASS);
+        }
+    }
+
+    public static void resetRace() {
         setPlayed(false);
         counter = 10;
         time = 0;
         GameSettings.getTntPodium().clear();
         GameSettings.getInTNT().clear();
+        fillFloors();
     }
 
 
@@ -56,18 +97,15 @@ public class TNTTask extends BukkitRunnable implements Listener {
     }
 
     @EventHandler
-    public void onMove(PlayerMoveEvent event){
+    public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if(counter<0){
-            if(EGames.getCurrentState().equals(EGames.TNT) && arena.isIn(player)){
-                if(alives.contains(player)){
-                    if(player.getWorld().getBlockAt(player.getLocation().subtract(0, 1, 0)).getType().equals(Material.GOLD_BLOCK)){
-                        Block block = player.getWorld().getBlockAt(player.getLocation().subtract(0, 1, 0));
-                        block.setType(Material.DIAMOND_BLOCK);
-                        Bukkit.getScheduler().runTaskLater(Olympiade.getInstance(), () -> {
-                            block.setType(Material.AIR);
-                        }, 10);
-                    }
+        if (counter < 0) {
+            if (EGames.getCurrentState().equals(EGames.TNT) && arena.isIn(player)) {
+                if (alives.contains(player)) {
+                    Block block = player.getWorld().getBlockAt(player.getLocation().subtract(0, 1, 0));
+                    Bukkit.getScheduler().runTaskLater(Olympiade.getInstance(), () -> {
+                        block.setType(Material.AIR);
+                    }, 10);
                 }
             }
         }
@@ -76,12 +114,12 @@ public class TNTTask extends BukkitRunnable implements Listener {
     @Override
     public void run() {
         if (counter == 10) {
-            Cuboid.fillStartJump();
+            fillFloors();
             for (Player players : Bukkit.getOnlinePlayers()) {
                 players.stopAllSounds();
                 alives.add(players);
                 GameSettings.getInTNT().put(players, false);
-                players.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -195.5, 44.5, -825.5));
+                players.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -196.5, 44, -810.5));
                 players.sendTitle("§cAttention !", "§6Placez vous devant la ligne de départ !", 10, 20, 10);
             }
         }
@@ -139,7 +177,7 @@ public class TNTTask extends BukkitRunnable implements Listener {
                 }
             }
 
-            if(alives.size() == 1){
+            if (alives.size() == 1) {
                 for (Player players : GameSettings.getGamePlayers()) {
                     players.sendTitle("§cTntRun terminé !", "§6Victoire de §e" + alives.get(0).getDisplayName(), 10, 100, 10);
                     WinFireworks.setWinner(alives.get(0));

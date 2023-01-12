@@ -3,6 +3,7 @@ version: '1.0'
 main: fr.zadiho.hepickstudio.olympiade.Olympiade
 api-version: 1.19
 authors: [ ZaDiHo ]
+load: POSTWORLD
 description: Plugins événementiel Olympiade Saison III regroupant différentes épreuves.
 depend:
   - LuckPerms
