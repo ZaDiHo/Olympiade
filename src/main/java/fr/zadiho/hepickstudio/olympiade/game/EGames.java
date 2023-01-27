@@ -7,7 +7,8 @@ public enum EGames {
     RACE("Course d'Arpenteur"),
     PVE("PvE"),
     TNT("TNT Run"),
-    PVP("FFA");
+    PVP("FFA"),
+    SURPRISE("Surprise");
 
     private String name;
     private static EGames currentState;

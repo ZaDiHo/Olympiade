@@ -1,6 +1,8 @@
 package fr.zadiho.hepickstudio.olympiade.game;
 
 import fr.zadiho.hepickstudio.olympiade.Olympiade;
+import fr.zadiho.hepickstudio.olympiade.guis.JumpGUI;
+import fr.zadiho.hepickstudio.olympiade.tasks.JumpTask;
 import fr.zadiho.hepickstudio.olympiade.utils.Cuboid;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
