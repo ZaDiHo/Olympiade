@@ -32,6 +32,7 @@ public class RegistrationManager {
         this.listeners.add(new TNTTask());
         this.listeners.add(new PVPTask());
         this.listeners.add(new SurpriseTask());
+        this.listeners.add(new PVETask());
         this.listeners.add(new RaceTask());
         this.listeners.add(new JumpTask());
         this.listeners.add(new OlympiadeTask());

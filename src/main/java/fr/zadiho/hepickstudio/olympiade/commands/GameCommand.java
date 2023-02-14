@@ -4,10 +4,7 @@ import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
 import fr.zadiho.hepickstudio.olympiade.guis.AdminGUI;
-import fr.zadiho.hepickstudio.olympiade.tasks.JumpTask;
-import fr.zadiho.hepickstudio.olympiade.tasks.PVPTask;
-import fr.zadiho.hepickstudio.olympiade.tasks.RaceTask;
-import fr.zadiho.hepickstudio.olympiade.tasks.TNTTask;
+import fr.zadiho.hepickstudio.olympiade.tasks.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -67,6 +64,11 @@ public class GameCommand implements CommandExecutor {
                     EGames.setState(EGames.PVP);
                     PVPTask pvpTask = new PVPTask();
                     pvpTask.runTaskTimer(Olympiade.getInstance(), 0, 20);
+                }
+                if (args[0].equalsIgnoreCase("pve")) {
+                    EGames.setState(EGames.PVE);
+                    PVETask pveTask = new PVETask();
+                    pveTask.runTaskTimer(Olympiade.getInstance(), 0, 20);
                 }
             } else {
                 player.sendMessage(GameSettings.prefix + ChatColor.translateAlternateColorCodes('&', "§cVous n'avez pas la permission d'utiliser cette commande !"));

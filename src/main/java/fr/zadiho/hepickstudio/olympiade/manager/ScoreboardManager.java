@@ -3,10 +3,7 @@ package fr.zadiho.hepickstudio.olympiade.manager;
 import fr.mrmicky.fastboard.FastBoard;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
-import fr.zadiho.hepickstudio.olympiade.tasks.JumpTask;
-import fr.zadiho.hepickstudio.olympiade.tasks.PVPTask;
-import fr.zadiho.hepickstudio.olympiade.tasks.RaceTask;
-import fr.zadiho.hepickstudio.olympiade.tasks.TNTTask;
+import fr.zadiho.hepickstudio.olympiade.tasks.*;
 import fr.zadiho.hepickstudio.olympiade.utils.Chrono;
 import org.bukkit.entity.Player;
 
@@ -104,6 +101,22 @@ public class ScoreboardManager {
                     "",
                     "§8■ §fÉpreuve §7➢ §cPVP",
                     "§8■ §fVivants §7➢ §e" + PVPTask.alives.size(),
+                    "§8■ §fJoueurs §7➢ §e" + GameSettings.getGamePlayers().size(),
+                    "§7§m------------------",
+                    "§6play.olympiade.fr"
+            );
+        }
+
+        if (EGames.getCurrentState() == EGames.PVE) {
+            boards.get(player).updateTitle("§c§nOlympiade III");
+            boards.get(player).updateLines(
+                    "§7§m------------------", // Empty line
+                    "§8■ §fCompte §7➢ §6" + player.getName(),
+                    "§8■ §fPoints §7➢ §6" + GameSettings.getPodium().get(player),
+                    "",
+                    "§8■ §fÉpreuve §7➢ §cPVP",
+                    "§8■ §fRestant §7➢ §e" + PVETask.entities,
+                    "§8■ §fVague §7➢ §e" + PVETask.getRound(),
                     "§8■ §fJoueurs §7➢ §e" + GameSettings.getGamePlayers().size(),
                     "§7§m------------------",
                     "§6play.olympiade.fr"

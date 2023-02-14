@@ -42,6 +42,7 @@ public class GameSettings {
     private static List<Player> pvpPodium = new ArrayList<>();
     private static List<Player> tntPodium = new ArrayList<>();
     private static List<Player> jumpPodium = new ArrayList<>();
+    private static HashMap<Player, Integer> pvePodium = new HashMap<>();
 
     //------------------
     public static List<Player> getRacePodium() {
@@ -57,6 +58,10 @@ public class GameSettings {
 
     public static List<Player> getJumpPodium() {
         return jumpPodium;
+    }
+
+    public static HashMap<Player, Integer> getPvePodium() {
+        return pvePodium;
     }
 
     public static HashMap<Player, Integer> getPodium() {
