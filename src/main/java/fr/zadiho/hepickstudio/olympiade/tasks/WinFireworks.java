@@ -11,20 +11,18 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class WinFireworks extends BukkitRunnable {
 
     private int timer = 10;
-    public static Player winner;
+    private static Player winner;
 
-    public static void setWinner(Player winner) {
-        WinFireworks.winner = winner;
+    public static void setWinner(Player player) {
+        winner = player;
     }
 
     @Override
     public void run() {
-
         Location loc = winner.getLocation();
         final Firework f = winner.getWorld().spawn(loc, Firework.class);
         FireworkMeta fm = f.getFireworkMeta();
         fm.addEffect(FireworkEffect.builder()
-
                 .flicker(true)
                 .trail(true)
                 .with(FireworkEffect.Type.STAR)

@@ -7,11 +7,8 @@ import fr.zadiho.hepickstudio.olympiade.tasks.OlympiadeTask;
 import fr.zadiho.hepickstudio.olympiade.tasks.TNTTask;
 import fr.zadiho.hepickstudio.olympiade.utils.Cuboid;
 import fr.zadiho.hepickstudio.olympiade.utils.Holograms;
-import fr.zadiho.hepickstudio.olympiade.utils.WorldUtils;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -54,24 +51,6 @@ public final class Olympiade extends JavaPlugin {
         Cuboid.fillStartJump();
         Cuboid.fillStartRace();
 
-        if(Bukkit.getWorlds().contains(Bukkit.getWorld("uhcrun"))){
-            WorldUtils.deleteWorld("uhcrun");
-        }
-        if(!(Bukkit.getWorlds().contains(Bukkit.getWorld("uhcrun")))){
-            final WorldCreator worldCreator = WorldUtils.setBoost(new WorldCreator("uhcrun"),
-                    2,
-                    3,
-                    3,
-                    2,
-                    2,
-                    10,
-                    4,
-                    false);
-            final World world = worldCreator.createWorld();
-            world.setSpawnLocation(0, 100, 0);
-            world.setGameRuleValue("doFireTick", "false");
-        }
-
 
 
         EGames.setState(EGames.WAITING);
@@ -98,7 +77,6 @@ public final class Olympiade extends JavaPlugin {
     @Override
     public void onDisable() {
         Holograms.clearHolograms();
-        WorldUtils.deleteWorld("uhcrun");
         super.onDisable();
     }
 

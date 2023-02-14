@@ -2,6 +2,7 @@ package fr.zadiho.hepickstudio.olympiade.tasks;
 
 import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
+import fr.zadiho.hepickstudio.olympiade.game.Game;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
 import fr.zadiho.hepickstudio.olympiade.utils.Chrono;
 import fr.zadiho.hepickstudio.olympiade.utils.Cuboid;
@@ -16,14 +17,17 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class JumpTask extends BukkitRunnable implements Listener {
 
-    private static int counter = 10;
+    private static List<Player> inJump = new ArrayList<>();
+    private static int counter = 20;
     public static boolean played = false;
     public static int time = 0;
-
+    private static int totalPlayers = 0;
     private static Cuboid endJump = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1003.5, 73.5, -1.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -997.5, 67, 10.5));
     private static Cuboid checkpoint2 = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1104.5, 67, 47.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1095.5, 68, 8.5));
     private static Cuboid checkpoint3 = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1095.5, 68, 8.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1091.5, 73, -1.5));
@@ -33,10 +37,11 @@ public class JumpTask extends BukkitRunnable implements Listener {
 
     public static void resetRace(){
         setPlayed(false);
+        totalPlayers = 0;
         counter = 10;
         time = 0;
         GameSettings.getJumpPodium().clear();
-        GameSettings.getInJump().clear();
+        getInJump().clear();
         checkPoints.clear();
         hidePlayer.clear();
     }
@@ -101,24 +106,36 @@ public class JumpTask extends BukkitRunnable implements Listener {
         JumpTask.played = played;
     }
 
+
+
+
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
-        event.setCancelled(true);
+        if(EGames.getCurrentState().equals(EGames.PARKOUR)){
+            event.setCancelled(true);
+        }
     }
 
     @Override
     public void run() {
-        if (counter == 10) {
+        if (counter == 20) {
             Cuboid.fillStartJump();
             for (Player players : Bukkit.getOnlinePlayers()) {
-                players.stopAllSounds();
+
                 hidePlayer.put(players, false);
-                GameSettings.getInJump().put(players, false);
+                getInJump().add(players);
                 checkPoints.put(players, 1);
                 players.teleport(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1147.5, 67, 41.5, -90, 0));
-                players.sendTitle("§cAttention !", "§6Placez vous devant la ligne de départ !", 10, 20, 10);
+
                 players.getInventory().setItem(7, new ItemBuilder(Material.DARK_OAK_DOOR).setName("§6Retour au checkpoint").toItemStack());
                 players.getInventory().setItem(8, new ItemBuilder(Material.LIGHT_BLUE_DYE).setName("§6Masquer les joueurs").toItemStack());
+                players.stopAllSounds();
+                players.playSound(players.getLocation(), Sound.MUSIC_DISC_13, 1, 1);
+            }
+        }
+        if(counter == 10){
+            for(Player players : Bukkit.getOnlinePlayers()){
+                players.sendTitle("§cAttention !", "§6Placez vous devant la ligne de départ !", 10, 20, 10);
             }
         }
         if (counter == 5) {
@@ -184,13 +201,12 @@ public class JumpTask extends BukkitRunnable implements Listener {
                     players.sendMessage("§aCheckpoint passé !");
                 }
                 if (endJump.isIn(players)) {
-                    if (!GameSettings.getInJump().get(players)) {
-                        GameSettings.getInJump().remove(players);
-                        GameSettings.getJumpPodium().put(players, GameSettings.getJumpPodium().size() + 1);
-                        Bukkit.broadcastMessage("§a" + players.getName() + " §6a terminé le jump à la position §e" + GameSettings.getJumpPodium().get(players) + " §6! Son chronomètre affichait §e" + Chrono.format(time));
+                    if (getInJump().contains(players)) {
+                        GameSettings.getJumpPodium().add(players);
+                        Bukkit.broadcastMessage("§a" + players.getName() + " §6a terminé le jump à la position §e" + (totalPlayers - inJump.size()) + " §6! Son chronomètre affichait §e" + Chrono.format(time));
+                        getInJump().remove(players);
                         players.setGameMode(GameMode.SPECTATOR);
                     }
-                    GameSettings.getInJump().put(players, true);
                 }
             }
             if(GameSettings.getGamePlayers().size() == GameSettings.getJumpPodium().size()){
@@ -198,27 +214,35 @@ public class JumpTask extends BukkitRunnable implements Listener {
                     players.sendTitle("§cTout le monde à terminé !", "§6Le parcours est terminé !", 10, 20, 10);
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
-                    GameSettings.teleportPodium(EGames.PARKOUR);
                     EGames.setState(EGames.WAITING);
+                    players.setGameMode(GameMode.ADVENTURE);
                     setPlayed(true);
                     Cuboid.fillStartJump();
                 }
+                Game.teleportPodium(GameSettings.getJumpPodium());
+                Game.givePoints(GameSettings.getJumpPodium());
                 cancel();
             }
-            if (time / 60 >= GameSettings.getParkourDuration()) {
+            if (time / 60 >= EGames.PARKOUR.getDuration()) {
                 for (Player players : GameSettings.getGamePlayers()) {
                     players.sendTitle("§cTemps écoulé !", "§6Le parcours est terminé !", 10, 20, 10);
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
-                    players.teleport(GameSettings.spawn);
                     EGames.setState(EGames.WAITING);
+                    players.setGameMode(GameMode.ADVENTURE);
                     setPlayed(true);
                     Cuboid.fillStartJump();
                 }
+                Game.teleportPodium(GameSettings.getJumpPodium());
+                Game.givePoints(GameSettings.getJumpPodium());
                 cancel();
             }
             time++;
         }
         counter--;
+    }
+
+    public static List<Player> getInJump() {
+        return inJump;
     }
 }

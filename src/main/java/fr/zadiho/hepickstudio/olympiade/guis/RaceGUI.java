@@ -31,7 +31,7 @@ public class RaceGUI implements InventoryProvider {
                 .setName(ChatColor.RED + EGames.RACE.getName())
                 .addLoreLine("§8§m-----------------------")
                 .addLoreLine("§8⭓ §7Épreuve: §eCourse d'arpenteur.")
-                .addLoreLine("§8⭓ §7Durée: §e" + GameSettings.getRaceDuration() + "min.")
+                .addLoreLine("§8⭓ §7Durée: §e" + EGames.RACE.getDuration() + "min.")
                 .addLoreLine("§8§m-----------------------")
                 .toItemStack());
         ClickableItem border = ClickableItem.empty(new ItemBuilder(Material.RED_STAINED_GLASS_PANE)

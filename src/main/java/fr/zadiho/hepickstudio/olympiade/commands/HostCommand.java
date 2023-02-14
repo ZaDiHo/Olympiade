@@ -8,11 +8,20 @@ import org.bukkit.command.CommandSender;
 
 public class HostCommand implements CommandExecutor {
 
+    /*
+     * Class Name : HostCommand
+     * Description   : Add host command
+     * Version       : 1.3
+     * Date          : 13/02/2023
+     * Copyright     : HepickStudio
+     */
 
+    //////////////////////////////////////////////HOST COMMAND EXECUTOR//////////////////////////////////////////////
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         GameSettings.getHostPlayers().add(Bukkit.getPlayer(args[0]));
         System.out.println(GameSettings.getHostPlayers());
         return true;
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

@@ -7,6 +7,7 @@ import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.Pagination;
 import fr.minuskube.inv.content.SlotIterator;
 import fr.zadiho.hepickstudio.olympiade.Olympiade;
+import fr.zadiho.hepickstudio.olympiade.game.Game;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
 import fr.zadiho.hepickstudio.olympiade.utils.ItemBuilder;
 import org.bukkit.ChatColor;
@@ -41,9 +42,9 @@ public class PlayersGUI implements InventoryProvider {
                     .setSkullOwner(target.getDisplayName())
                     .setName(ChatColor.GREEN + target.getDisplayName())
                     .addLoreLine("§8§m-----------------------")
-                    .addLoreLine("§8⭓ §fGrade: §e" + GameSettings.getPrefix(target))
+                    .addLoreLine("§8⭓ §fGrade: §e" + Game.getPlayerPrefix(target))
                     .addLoreLine("§8⭓ §fPoints: §e" + GameSettings.getPodium().get(target))
-                    .addLoreLine("§8⭓ §fClassements: §e" + GameSettings.getPodium().get(target))
+                    .addLoreLine("§8⭓ §fClassements: §e" + GameSettings.getPlace(target))
                     .addLoreLine("§8⭓ §fKills: §e0")
                     .addLoreLine("§8§m-----------------------")
                     .addLoreLine("§8§l§8» §cCliquez pour vous y §ntéléporter.")

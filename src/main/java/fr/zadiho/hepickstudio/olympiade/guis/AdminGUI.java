@@ -6,7 +6,6 @@ import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
 import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
-import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
 import fr.zadiho.hepickstudio.olympiade.utils.ItemBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -41,7 +40,7 @@ public class AdminGUI implements InventoryProvider {
                 .setName(ChatColor.RED + EGames.PARKOUR.getName())
                 .addLoreLine("§8§m-----------------------")
                 .addLoreLine("§8⭓ §7Épreuve: §eJump.")
-                .addLoreLine("§8⭓ §7Durée: §e" + GameSettings.getParkourDuration() + "min.")
+                .addLoreLine("§8⭓ §7Durée: §e" + EGames.PARKOUR.getDuration() + "min.")
                 .addLoreLine("§7")
                 .addLoreLine("§eCliquez pour ouvrir le menu.")
                 .addLoreLine("§8§m-----------------------")
@@ -54,7 +53,7 @@ public class AdminGUI implements InventoryProvider {
                 .setName(ChatColor.RED + EGames.RACE.getName())
                 .addLoreLine("§8§m-----------------------")
                 .addLoreLine("§8⭓ §7Épreuve: §eCourse d'arpenteur.")
-                .addLoreLine("§8⭓ §7Durée: §e" + GameSettings.getRaceDuration() + "min.")
+                .addLoreLine("§8⭓ §7Durée: §e" + EGames.RACE.getDuration() + "min.")
                 .addLoreLine("§7")
                 .addLoreLine("§eCliquez pour ouvrir le menu.")
                 .addLoreLine("§8§m-----------------------")
@@ -67,7 +66,7 @@ public class AdminGUI implements InventoryProvider {
                 .setName(ChatColor.RED + EGames.PVE.getName())
                 .addLoreLine("§8§m-----------------------")
                 .addLoreLine("§8⭓ §7Épreuve: §ePVE.")
-                .addLoreLine("§8⭓ §7Durée: §e" + GameSettings.getParkourDuration() + "min.")
+                .addLoreLine("§8⭓ §7Durée: §e" + EGames.PVE.getDuration() + "min.")
                 .addLoreLine("§7")
                 .addLoreLine("§eCliquez pour ouvrir le menu.")
                 .addLoreLine("§8§m-----------------------")
@@ -79,24 +78,39 @@ public class AdminGUI implements InventoryProvider {
                 .setName(ChatColor.RED + EGames.TNT.getName())
                 .addLoreLine("§8§m-----------------------")
                 .addLoreLine("§8⭓ §7Épreuve: §eTNT Run.")
-                .addLoreLine("§8⭓ §7Durée: §e" + GameSettings.getParkourDuration() + "min.")
+                .addLoreLine("§8⭓ §7Durée: §e" + EGames.TNT.getDuration() + "min.")
                 .addLoreLine("§7")
                 .addLoreLine("§eCliquez pour ouvrir le menu.")
                 .addLoreLine("§8§m-----------------------")
                 .toItemStack(), e -> {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+            TNTGUI.INVENTORY.open(player);
         });
 
         ClickableItem pvp = ClickableItem.of(new ItemBuilder(Material.NETHERITE_SWORD)
                 .setName(ChatColor.RED + EGames.PVP.getName())
-                        .addLoreLine("§8§m-----------------------")
-                        .addLoreLine("§8⭓ §7Épreuve: §ePVP.")
-                        .addLoreLine("§8⭓ §7Durée: §e" + GameSettings.getParkourDuration() + "min.")
-                        .addLoreLine("§7")
-                        .addLoreLine("§eCliquez pour ouvrir le menu.")
-                        .addLoreLine("§8§m-----------------------")
+                .addLoreLine("§8§m-----------------------")
+                .addLoreLine("§8⭓ §7Épreuve: §ePVP.")
+                .addLoreLine("§8⭓ §7Durée: §e" + EGames.PVP.getDuration() + "min.")
+                .addLoreLine("§7")
+                .addLoreLine("§eCliquez pour ouvrir le menu.")
+                .addLoreLine("§8§m-----------------------")
                 .toItemStack(), e -> {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+            PVPGUI.INVENTORY.open(player);
+        });
+
+        ClickableItem surprise = ClickableItem.of(new ItemBuilder(Material.CHEST)
+                .setName(ChatColor.RED + EGames.SURPRISE.getName())
+                .addLoreLine("§8§m-----------------------")
+                .addLoreLine("§8⭓ §7Épreuve: §eSurprise.")
+                .addLoreLine("§8⭓ §7Durée: §eIllimité.")
+                .addLoreLine("§7")
+                .addLoreLine("§eCliquez pour ouvrir le menu.")
+                .addLoreLine("§8§m-----------------------")
+                .toItemStack(), e -> {
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+            SurpriseGUI.INVENTORY.open(player);
         });
 
         ClickableItem leave = ClickableItem.of(new ItemBuilder(Material.SPRUCE_DOOR)
@@ -111,6 +125,7 @@ public class AdminGUI implements InventoryProvider {
         contents.set(2, 4, pve);
         contents.set(2, 5, tnt);
         contents.set(2, 6, pvp);
+        contents.set(2, 8, surprise);
         contents.set(4, 4, leave);
 
         contents.set(0, 0, border);

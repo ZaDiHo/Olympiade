@@ -8,33 +8,33 @@ import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
 import fr.zadiho.hepickstudio.olympiade.tasks.JumpTask;
+import fr.zadiho.hepickstudio.olympiade.tasks.PVPTask;
 import fr.zadiho.hepickstudio.olympiade.tasks.RaceTask;
 import fr.zadiho.hepickstudio.olympiade.utils.ItemBuilder;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
-public class JumpGUI implements InventoryProvider {
+public class PVPGUI implements InventoryProvider {
 
     public static final SmartInventory INVENTORY = SmartInventory.builder()
-            .id("jump")
-            .provider(new JumpGUI())
+            .id("pvp")
+            .provider(new PVPGUI())
             .size(5, 9)
-            .title("§cParcours")
+            .title("§cPvP")
             .manager(Olympiade.getInventoryManager())
             .build();
 
 
+
     @Override
     public void init(Player player, InventoryContents contents) {
-        ClickableItem jump = ClickableItem.of(new ItemBuilder(Material.FEATHER)
-                .setName(ChatColor.RED + EGames.PARKOUR.getName())
+        ClickableItem race = ClickableItem.empty(new ItemBuilder(Material.NETHERITE_SWORD)
+                .setName(ChatColor.RED + EGames.PVP.getName())
                 .addLoreLine("§8§m-----------------------")
-                .addLoreLine("§8⭓ §7Épreuve: §eJump.")
-                .addLoreLine("§8⭓ §7Durée: §e" + EGames.PARKOUR.getDuration() + "min.")
+                .addLoreLine("§8⭓ §7Épreuve: §ePVP.")
+                .addLoreLine("§8⭓ §7Durée: §e" + EGames.PVP.getDuration() + "min.")
                 .addLoreLine("§8§m-----------------------")
-                .toItemStack(), e -> {
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-        });
+                .toItemStack());
         ClickableItem border = ClickableItem.empty(new ItemBuilder(Material.RED_STAINED_GLASS_PANE)
                 .setName("§l§cOlympiade")
                 .toItemStack());
@@ -53,34 +53,34 @@ public class JumpGUI implements InventoryProvider {
                 .setName("§8§l§8» §a§lC'est parti !")
                 .toItemStack(), e -> {
             AdminGUI.SMART_INVENTORY.open(player);
-            if (JumpTask.isPlayed() || EGames.getCurrentState().equals(EGames.PARKOUR)) {
-                if (JumpTask.isPlayed()) {
+            if(PVPTask.isPlayed() || EGames.getCurrentState().equals(EGames.PVP)){
+                if(PVPTask.isPlayed()){
                     player.sendMessage("§cL'épreuve à déjà été faite, vous pouvez cependant la réinitialiser.");
                 }
-                if (EGames.getCurrentState().equals(EGames.PARKOUR)) {
+                if(EGames.getCurrentState().equals(EGames.PVP)){
                     player.sendMessage("§cL'épreuve est déjà en cours !");
                 }
                 player.closeInventory();
                 player.playSound(player.getLocation(), Sound.ENTITY_CAT_HISS, 1, 1);
-            } else {
-                EGames.setState(EGames.PARKOUR);
-                JumpTask jumpTask = new JumpTask();
-                jumpTask.runTaskTimer(Olympiade.getInstance(), 0, 20);
+            }else{
+                EGames.setState(EGames.PVP);
+                PVPTask pvpTask = new PVPTask();
+                pvpTask.runTaskTimer(Olympiade.getInstance(), 0, 20);
             }
         });
 
         ClickableItem rules = ClickableItem.of(new ItemBuilder(Material.BLAZE_POWDER)
                 .setName("§8§l§8» §e§lSalle des règles !")
                 .toItemStack(), e -> {
-            for (Player players : Bukkit.getOnlinePlayers()) {
-                players.teleport(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1171.5, 68, 40.5, -90, 0));
+            for(Player players : Bukkit.getOnlinePlayers()){
+                players.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -1803.5, 265, -1435.5, 0, 0));
             }
         });
 
         ClickableItem reset = ClickableItem.of(new ItemBuilder(Material.REDSTONE)
                 .setName("§8§l§8» §c§lRéinitialiser ! §7(§6Instantané§7)")
                 .toItemStack(), e -> {
-            JumpTask.resetRace();
+            PVPTask.resetPVP();
             player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
         });
 
@@ -88,9 +88,9 @@ public class JumpGUI implements InventoryProvider {
         contents.set(2, 3, start);
         contents.set(2, 4, rules);
         contents.set(2, 5, reset);
-        contents.set(0, 4, jump);
-        contents.set(4, 4, leave);
-        contents.set(4, 3, back);
+        contents.set(0, 4, race);
+        contents.set(4,4, leave);
+        contents.set(4,3, back);
         contents.set(0, 0, border);
         contents.set(0, 1, border);
         contents.set(0, 7, border);

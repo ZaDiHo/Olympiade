@@ -1,8 +1,10 @@
 package fr.zadiho.hepickstudio.olympiade.listeners;
 
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
+import fr.zadiho.hepickstudio.olympiade.game.Game;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
 import fr.zadiho.hepickstudio.olympiade.manager.PlayerManager;
+import fr.zadiho.hepickstudio.olympiade.manager.ScoreboardManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
@@ -18,8 +20,8 @@ public class PlayerJoin implements Listener {
         Player player = event.getPlayer();
         if(EGames.getCurrentState() == EGames.WAITING){
             event.setJoinMessage(null);
-            Bukkit.broadcastMessage("§7(§a§l»§7) §f" + GameSettings.getPrefix(player) + player.getName());
-            player.sendTitle("§c§lOlympiade III", "§fBienvenue " + GameSettings.getPrefix(player) + player.getName());
+            Bukkit.broadcastMessage("§7(§a§l»§7) §f" + Game.getPlayerPrefix(player) + player.getName());
+            player.sendTitle("§c§lOlympiade III", "§fBienvenue " + Game.getPlayerPrefix(player) + player.getName());
             player.setGameMode(GameMode.ADVENTURE);
             player.setHealth(20);
             player.playSound(player.getLocation(), Sound.ENTITY_MOOSHROOM_CONVERT, 1, 1);
@@ -32,12 +34,7 @@ public class PlayerJoin implements Listener {
             }
             player.playSound(player.getLocation(), Sound.MUSIC_DISC_11, 1, 1);
             PlayerManager.registerPlayer(player);
+            ScoreboardManager.createScoreboard(player);
         }
-
-        //if(player.isOp()){
-        //    GameSettings.getHostPlayers().add(player);
-        //}else{
-        //    GameSettings.getGamePlayers().add(player);
-        //}
     }
 }

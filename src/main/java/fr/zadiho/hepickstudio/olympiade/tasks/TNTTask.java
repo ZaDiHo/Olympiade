@@ -2,7 +2,9 @@ package fr.zadiho.hepickstudio.olympiade.tasks;
 
 import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
+import fr.zadiho.hepickstudio.olympiade.game.Game;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
+import fr.zadiho.hepickstudio.olympiade.listeners.PlayerQuit;
 import fr.zadiho.hepickstudio.olympiade.utils.Chrono;
 import fr.zadiho.hepickstudio.olympiade.utils.Cuboid;
 import fr.zadiho.hepickstudio.olympiade.utils.ItemBuilder;
@@ -16,20 +18,22 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 public class TNTTask extends BukkitRunnable implements Listener {
 
     private static int counter = 10;
     public static boolean played = false;
     public static int time = 0;
+    private static List<Player> inTNT = new ArrayList<>();
 
     public static ArrayList<Player> alives = new ArrayList<>();
-    private static HashMap<Player, Integer> podium = new HashMap();
 
     private static Cuboid arena = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -217.5, -55.5, -803.5), new Location(Bukkit.getWorld("OlympiadeS3"), -172.5, 71, -847));
     private static Cuboid endTNT = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -171.5, -61, -802), new Location(Bukkit.getWorld("OlympiadeS3"), -221.5, -52.5, -851.5));
@@ -73,12 +77,22 @@ public class TNTTask extends BukkitRunnable implements Listener {
         }
     }
 
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event){
+        if(EGames.getCurrentState().equals(EGames.TNT)){
+            if(alives.contains(event.getPlayer())){
+                alives.remove(event.getPlayer());
+            }
+            getInTNT().remove(event.getPlayer());
+        }
+    }
+
     public static void resetRace() {
         setPlayed(false);
         counter = 10;
         time = 0;
         GameSettings.getTntPodium().clear();
-        GameSettings.getInTNT().clear();
+        getInTNT().clear();
         fillFloors();
     }
 
@@ -93,7 +107,9 @@ public class TNTTask extends BukkitRunnable implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
-        event.setCancelled(true);
+        if(EGames.getCurrentState() == EGames.TNT){
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -103,8 +119,10 @@ public class TNTTask extends BukkitRunnable implements Listener {
             if (EGames.getCurrentState().equals(EGames.TNT) && arena.isIn(player)) {
                 if (alives.contains(player)) {
                     Block block = player.getWorld().getBlockAt(player.getLocation().subtract(0, 1, 0));
+                    Block block1 = player.getWorld().getBlockAt(player.getLocation());
                     Bukkit.getScheduler().runTaskLater(Olympiade.getInstance(), () -> {
                         block.setType(Material.AIR);
+                        block1.setType(Material.AIR);
                     }, 10);
                 }
             }
@@ -117,8 +135,9 @@ public class TNTTask extends BukkitRunnable implements Listener {
             fillFloors();
             for (Player players : Bukkit.getOnlinePlayers()) {
                 players.stopAllSounds();
+                players.playSound(players.getLocation(), Sound.ENTITY_CAT_AMBIENT, 1, 1);
                 alives.add(players);
-                GameSettings.getInTNT().put(players, false);
+                getInTNT().add(players);
                 players.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -196.5, 44, -810.5));
                 players.sendTitle("§cAttention !", "§6Placez vous devant la ligne de départ !", 10, 20, 10);
             }
@@ -166,44 +185,50 @@ public class TNTTask extends BukkitRunnable implements Listener {
                 }
 
                 if (endTNT.isIn(players)) {
-                    if (!GameSettings.getInTNT().get(players)) {
-                        GameSettings.getInTNT().remove(players);
-                        GameSettings.getTntPodium().put(players, GameSettings.getJumpPodium().size() + 1);
+                    if (getInTNT().contains(players)) {
+                        getInTNT().remove(players);
+                        GameSettings.getTntPodium().add(players);
                         alives.remove(players);
                         Bukkit.broadcastMessage("§a" + players.getName() + " §6est mort ! §7(§c" + alives.size() + "§8/§e" + GameSettings.getGamePlayers().size() + "§7)");
                         players.setGameMode(GameMode.SPECTATOR);
                     }
-                    GameSettings.getInTNT().put(players, true);
                 }
             }
 
             if (alives.size() == 1) {
                 for (Player players : GameSettings.getGamePlayers()) {
+                    GameSettings.getTntPodium().add(alives.get(0));
+                    getInTNT().remove(alives.get(0));
                     players.sendTitle("§cTntRun terminé !", "§6Victoire de §e" + alives.get(0).getDisplayName(), 10, 100, 10);
-                    WinFireworks.setWinner(alives.get(0));
-                    WinFireworks winFireworks = new WinFireworks();
-                    winFireworks.runTaskTimer(Olympiade.getInstance(), 0, 20);
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
-                    GameSettings.teleportPodium(EGames.TNT);
+                    players.setGameMode(GameMode.ADVENTURE);
                     EGames.setState(EGames.WAITING);
                     setPlayed(true);
                 }
+                Game.teleportReversedPodium(GameSettings.getTntPodium());
+                Game.giveReversedPoints(GameSettings.getTntPodium());
                 cancel();
             }
-            if (time / 60 >= GameSettings.getTntDuration()) {
+            if (time / 60 >= EGames.TNT.getDuration()) {
                 for (Player players : GameSettings.getGamePlayers()) {
                     players.sendTitle("§cTemps écoulé !", "§6Le parcours est terminé !", 10, 100, 10);
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
-                    players.teleport(GameSettings.spawn);
+                    players.setGameMode(GameMode.ADVENTURE);
                     EGames.setState(EGames.WAITING);
                     setPlayed(true);
                 }
+                Game.teleportReversedPodium(GameSettings.getTntPodium());
+                Game.giveReversedPoints(GameSettings.getTntPodium());
                 cancel();
             }
             time++;
         }
         counter--;
+    }
+
+    public static List<Player> getInTNT() {
+        return inTNT;
     }
 }
