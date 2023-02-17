@@ -6,6 +6,7 @@ import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
 import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
+import fr.zadiho.hepickstudio.olympiade.tasks.PVETask;
 import fr.zadiho.hepickstudio.olympiade.utils.ItemBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -72,6 +73,7 @@ public class AdminGUI implements InventoryProvider {
                 .addLoreLine("§8§m-----------------------")
                 .toItemStack(), e -> {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+            PVEGUI.INVENTORY.open(player);
         });
 
         ClickableItem tnt = ClickableItem.of(new ItemBuilder(Material.TNT)

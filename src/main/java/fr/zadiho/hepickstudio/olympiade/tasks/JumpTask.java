@@ -27,6 +27,7 @@ public class JumpTask extends BukkitRunnable implements Listener {
     private static int counter = 20;
     public static boolean played = false;
     public static int time = 0;
+    private static int place = 1;
     private static int totalPlayers = 0;
     private static Cuboid endJump = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1003.5, 73.5, -1.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -997.5, 67, 10.5));
     private static Cuboid checkpoint2 = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1104.5, 67, 47.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1095.5, 68, 8.5));
@@ -40,6 +41,7 @@ public class JumpTask extends BukkitRunnable implements Listener {
         totalPlayers = 0;
         counter = 10;
         time = 0;
+        place = 1;
         GameSettings.getJumpPodium().clear();
         getInJump().clear();
         checkPoints.clear();
@@ -203,7 +205,8 @@ public class JumpTask extends BukkitRunnable implements Listener {
                 if (endJump.isIn(players)) {
                     if (getInJump().contains(players)) {
                         GameSettings.getJumpPodium().add(players);
-                        Bukkit.broadcastMessage("§a" + players.getName() + " §6a terminé le jump à la position §e" + (totalPlayers - inJump.size()) + " §6! Son chronomètre affichait §e" + Chrono.format(time));
+                        Bukkit.broadcastMessage("§a" + players.getName() + " §6a terminé le jump à la position §e" + (place) + " §6! Son chronomètre affichait §e" + Chrono.format(time));
+                        place ++;
                         getInJump().remove(players);
                         players.setGameMode(GameMode.SPECTATOR);
                     }
@@ -218,9 +221,12 @@ public class JumpTask extends BukkitRunnable implements Listener {
                     players.setGameMode(GameMode.ADVENTURE);
                     setPlayed(true);
                     Cuboid.fillStartJump();
+                    players.showPlayer(Olympiade.getInstance(), players);
+                    players.getActivePotionEffects().clear();
                 }
                 Game.teleportPodium(GameSettings.getJumpPodium());
                 Game.givePoints(GameSettings.getJumpPodium());
+                hidePlayer.clear();
                 cancel();
             }
             if (time / 60 >= EGames.PARKOUR.getDuration()) {
@@ -232,9 +238,12 @@ public class JumpTask extends BukkitRunnable implements Listener {
                     players.setGameMode(GameMode.ADVENTURE);
                     setPlayed(true);
                     Cuboid.fillStartJump();
+                    players.showPlayer(Olympiade.getInstance(), players);
+                    players.getActivePotionEffects().clear();
                 }
                 Game.teleportPodium(GameSettings.getJumpPodium());
                 Game.givePoints(GameSettings.getJumpPodium());
+                hidePlayer.clear();
                 cancel();
             }
             time++;

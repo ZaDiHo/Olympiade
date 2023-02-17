@@ -44,6 +44,20 @@ public class GameSettings {
     private static List<Player> jumpPodium = new ArrayList<>();
     private static HashMap<Player, Integer> pvePodium = new HashMap<>();
 
+    public static List<Player> pvePodiumList(){
+        List<Map.Entry<Player, Integer>> list = new LinkedList<>(getPvePodium().entrySet());
+        Collections.sort(list, new Comparator<Map.Entry<Player, Integer>>() {
+            public int compare(Map.Entry<Player, Integer> o1, Map.Entry<Player, Integer> o2) {
+                return o2.getValue().compareTo(o1.getValue());
+            }
+        });
+        List<Player> sortedPlayers = new ArrayList<>();
+        for (Map.Entry<Player, Integer> entry : list) {
+            sortedPlayers.add(entry.getKey());
+        }
+        return sortedPlayers;
+    }
+
     //------------------
     public static List<Player> getRacePodium() {
         return racePodium;

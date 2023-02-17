@@ -12,7 +12,7 @@ public enum EGames {
 
     ///////////////////////GAME ENUMERATION///////////////////////
     WAITING("En attente", -1),
-    PARKOUR("Jump", 20),
+    PARKOUR("Jump", 15),
     RACE("Course d'Arpenteur", 10),
     PVE("PvE", 20),
     TNT("TNT Run", 10),
@@ -21,9 +21,9 @@ public enum EGames {
     /////////////////////////////////////////////////////////////
 
     ///////////////////////GAME VARIABLES////////////////////////
-    private String name;
+    private final String name;
     private static EGames currentState;
-    private Integer duration;
+    private final Integer duration;
     /////////////////////////////////////////////////////////////
 
     ///////////////////////GAME CONSTRUCTOR//////////////////////

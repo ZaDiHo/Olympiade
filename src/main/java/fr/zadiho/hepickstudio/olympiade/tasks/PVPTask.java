@@ -1,5 +1,6 @@
 package fr.zadiho.hepickstudio.olympiade.tasks;
 
+import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
 import fr.zadiho.hepickstudio.olympiade.game.Game;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
@@ -20,7 +21,7 @@ import java.util.Random;
 
 public class PVPTask extends BukkitRunnable implements Listener {
 
-    private static int counter = 10;
+    private static int counter = 20;
     public static boolean played = false;
     public static int time = 0;
     private static List<Player> inPVP = new ArrayList<>();
@@ -30,7 +31,7 @@ public class PVPTask extends BukkitRunnable implements Listener {
 
     public static void resetPVP() {
         setPlayed(false);
-        counter = 10;
+        counter = 20;
         alives.clear();
         time = 0;
         GameSettings.getPvpPodium().clear();
@@ -93,12 +94,17 @@ public class PVPTask extends BukkitRunnable implements Listener {
         }
     }
 
+    /*
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         if (EGames.getCurrentState().equals(EGames.PVP)) {
             event.setDeathMessage(null);
+            GameSettings.getPvpPodium().add(event.getEntity().getPlayer());
+            Player player = event.getEntity().getPlayer();
         }
     }
+
+     */
 
     public void upgradeStuff(Player player) {
         Random random = new Random();
@@ -175,15 +181,21 @@ public class PVPTask extends BukkitRunnable implements Listener {
 
     @Override
     public void run() {
-        if (counter == 10) {
+        if (counter == 20) {
             for (Player players : Bukkit.getOnlinePlayers()) {
-                players.stopAllSounds();
+                players.showPlayer(Olympiade.getInstance(), players);
+                players.getActivePotionEffects().clear();
                 Bukkit.getWorld("OlympiadeS3").setPVP(false);
-                players.playSound(players.getLocation(), Sound.ENTITY_CAT_AMBIENT, 1, 1);
                 players.setGameMode(GameMode.SURVIVAL);
                 alives.add(players);
                 getInPVP().add(players);
                 players.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -1803.5, 265, -1435.5, 0, 0));
+                players.stopAllSounds();
+                players.playSound(players.getLocation(), Sound.MUSIC_DISC_CHIRP, 1, 1);
+            }
+        }
+        if (counter == 10) {
+            for (Player players : Bukkit.getOnlinePlayers()) {
                 players.sendTitle("§cAttention !", "§6Placez vous devant la ligne de départ !", 10, 20, 10);
             }
         }
@@ -227,7 +239,10 @@ public class PVPTask extends BukkitRunnable implements Listener {
 
         }
         if (counter == -10) {
-            Bukkit.broadcastMessage("§6Le PVP est activé !");
+            Bukkit.broadcastMessage("§cAttention ! La période d'invinibilité est terminée !");
+            for(Player players : alives) {
+                players.playSound(players.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1, 1);
+            }
             Bukkit.getWorld("OlympiadeS3").setPVP(true);
         }
         if (counter < 0) {
@@ -235,21 +250,27 @@ public class PVPTask extends BukkitRunnable implements Listener {
                 if (players.isVisualFire()) {
                     players.setVisualFire(false);
                 }
+                if(players.getHealth() <= 0) {
+                    players.setHealth(20);
+                    players.setFoodLevel(20);
+                    players.setGameMode(GameMode.SPECTATOR);
+                    players.setVisualFire(true);
+                    alives.remove(players);
+                }
             }
-
             if (alives.size() == 1) {
                 for (Player players : GameSettings.getGamePlayers()) {
-                    GameSettings.getTntPodium().add(alives.get(0));
-                    getInPVP().remove(alives.get(0));
                     players.sendTitle("§cPVP terminé !", "§6Victoire de §e" + alives.get(0).getDisplayName(), 10, 100, 10);
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
                     players.setGameMode(GameMode.ADVENTURE);
-                    EGames.setState(EGames.WAITING);
-                    setPlayed(true);
                 }
-                Game.teleportReversedPodium(GameSettings.getPvpPodium());
-                Game.giveReversedPoints(GameSettings.getPvpPodium());
+                GameSettings.getPvpPodium().add(alives.get(0));
+                getInPVP().remove(alives.get(0));
+                EGames.setState(EGames.WAITING);
+                setPlayed(true);
+                Game.reversedTeleportPodium(GameSettings.getPvpPodium());
+                Game.reversedGivePoints(GameSettings.getPvpPodium());
                 cancel();
             }
             if (time / 60 >= EGames.TNT.getDuration()) {
@@ -258,11 +279,11 @@ public class PVPTask extends BukkitRunnable implements Listener {
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
                     players.setGameMode(GameMode.ADVENTURE);
-                    EGames.setState(EGames.WAITING);
-                    setPlayed(true);
                 }
-                Game.teleportReversedPodium(GameSettings.getPvpPodium());
-                Game.giveReversedPoints(GameSettings.getPvpPodium());
+                EGames.setState(EGames.WAITING);
+                setPlayed(true);
+                Game.reversedTeleportPodium(GameSettings.getPvpPodium());
+                Game.reversedGivePoints(GameSettings.getPvpPodium());
                 cancel();
             }
             time++;

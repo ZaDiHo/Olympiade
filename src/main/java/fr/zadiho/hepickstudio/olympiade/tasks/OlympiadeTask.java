@@ -1,6 +1,7 @@
 package fr.zadiho.hepickstudio.olympiade.tasks;
 
 import fr.mrmicky.fastboard.FastBoard;
+import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
 import fr.zadiho.hepickstudio.olympiade.game.Game;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
@@ -51,7 +52,7 @@ public class OlympiadeTask extends BukkitRunnable implements Listener {
     @Override
     public void run() {
         for(Player players : GameSettings.getGamePlayers()){
-            if((EGames.getCurrentState() == EGames.WAITING || EGames.getCurrentState() == EGames.PVP || EGames.getCurrentState() == EGames.PVE || EGames.getCurrentState() == EGames.SURPRISE) && !(GameSettings.getHostPlayers().contains(players))){
+            if((EGames.getCurrentState() == EGames.WAITING || EGames.getCurrentState() == EGames.PVE && !(GameSettings.getHostPlayers().contains(players)))){
                 if(!(players.getGameMode() == GameMode.ADVENTURE)){
                     players.setGameMode(GameMode.ADVENTURE);
                 }
@@ -71,6 +72,11 @@ public class OlympiadeTask extends BukkitRunnable implements Listener {
             Cuboid netherPortal = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1339.5, 73, 22.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1337.5, 82, 26.5));
             if (netherPortal.isIn(players)) {
                 players.teleport(GameSettings.spawn);
+            }
+            if(EGames.getCurrentState() == EGames.WAITING) {
+                players.showPlayer(Olympiade.getInstance(), players);
+                players.getActivePotionEffects().clear();
+                players.setGlowing(false);
             }
             PlayerManager.registerPlayer(players);
             PlayerManager.hostItem(players);

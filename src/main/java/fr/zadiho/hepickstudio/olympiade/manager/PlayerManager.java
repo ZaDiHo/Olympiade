@@ -24,6 +24,5 @@ public class PlayerManager {
 
     public static void unregisterPlayer(Player player){
         GameSettings.getGamePlayers().remove(player);
-        GameSettings.getPodium().remove(player);
     }
 }

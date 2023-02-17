@@ -1,5 +1,6 @@
 package fr.zadiho.hepickstudio.olympiade.listeners;
 
+import fr.zadiho.hepickstudio.olympiade.game.EGames;
 import fr.zadiho.hepickstudio.olympiade.game.Game;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
 import fr.zadiho.hepickstudio.olympiade.manager.PlayerManager;
@@ -12,6 +13,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerQuit implements Listener {
 
+
+
     @EventHandler
     public void onQuit(PlayerQuitEvent event){
         Player player = event.getPlayer();
@@ -20,5 +23,8 @@ public class PlayerQuit implements Listener {
         PlayerManager.unregisterPlayer(player);
         GameSettings.getHostPlayers().remove(player);
         ScoreboardManager.deleteScoreboard(player);
+        if(EGames.getCurrentState().equals(EGames.PVP)){
+
+        }
     }
 }

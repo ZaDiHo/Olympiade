@@ -1,5 +1,6 @@
 package fr.zadiho.hepickstudio.olympiade.tasks;
 
+import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
 import fr.zadiho.hepickstudio.olympiade.game.Game;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
@@ -40,7 +41,8 @@ public class RaceTask extends BukkitRunnable implements Listener {
     private static Cuboid portal2 = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -656, 69, 222.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -662.5, 83, 225.5));
     public static Cuboid endRace = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -564.5, 45, 270.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -570.5, 30, 277.5));
     private static List<Player> inRace = new ArrayList<>();
-    private static int counter = 10;
+    private static int counter = 17;
+    private static int place = 1;
     public static int time = 0;
     private static boolean played = false;
     private static int totalPlayers = 0;
@@ -50,7 +52,8 @@ public class RaceTask extends BukkitRunnable implements Listener {
     public static void resetRace() {
         setPlayed(false);
         totalPlayers = 0;
-        counter = 10;
+        counter = 17;
+        place = 1;
         time = 0;
         getInRace().clear();
         GameSettings.getRacePodium().clear();
@@ -96,18 +99,25 @@ public class RaceTask extends BukkitRunnable implements Listener {
     //////////////////////////////////////////////////////RUN///////////////////////////////////////////////////////////
     @Override
     public void run() {
-        if (counter == 10) {
-            Cuboid.fillStartRace();
-            for (Player players : Bukkit.getOnlinePlayers()) {
-                players.stopAllSounds();
-                players.playSound(players.getLocation(), Sound.MUSIC_DISC_13, 1, 1);
-                getInRace().add(players);
+        if(counter == 17){
+            for(Player players : Bukkit.getOnlinePlayers()){
                 players.teleport(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -882.7, 91.5, 57.0, 90, 0));
-                players.sendTitle("§cAttention !", "§6Placez vous devant la ligne de départ !", 10, 20, 10);
+                players.stopAllSounds();
+                players.playSound(players.getLocation(), Sound.MUSIC_DISC_BLOCKS, 1, 1);
                 Strider monture = (Strider) players.getWorld().spawnEntity(players.getLocation(), EntityType.STRIDER);
                 monture.setSaddle(true);
                 monture.addPassenger(players);
                 players.getInventory().setItem(4, new ItemBuilder(Material.WARPED_FUNGUS_ON_A_STICK).setName("§6Bâton de course").toItemStack());
+                players.showPlayer(Olympiade.getInstance(), players);
+                players.getActivePotionEffects().clear();
+                getInRace().add(players);
+            }
+        }
+        if (counter == 10) {
+            Cuboid.fillStartRace();
+            for (Player players : Bukkit.getOnlinePlayers()) {
+                players.sendTitle("§cAttention !", "§6Placez vous devant la ligne de départ !", 10, 20, 10);
+
             }
         }
         if (counter == 5) {
@@ -163,7 +173,7 @@ public class RaceTask extends BukkitRunnable implements Listener {
                 }
                 if (portal2.isIn(players)) {
                     Objects.requireNonNull(players.getVehicle()).remove();
-                    players.teleport(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -650, 76, 272.5, -90, 0));
+                    players.teleport(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -650, 75, 272.5, -90, 0));
                     Strider monture = (Strider) players.getWorld().spawnEntity(players.getLocation(), EntityType.STRIDER);
                     monture.setSaddle(true);
                     monture.addPassenger(players);
@@ -172,7 +182,8 @@ public class RaceTask extends BukkitRunnable implements Listener {
                     if (getInRace().contains(players)) {
                         getInRace().remove(players);
                         GameSettings.getRacePodium().add(players);
-                        Bukkit.broadcastMessage("§a" + players.getName() + " §6a terminé la course à la position §e" + (totalPlayers - getInRace().size()) + " §6! Son chronomètre affichait §e" + Chrono.format(time));
+                        Bukkit.broadcastMessage("§a" + players.getName() + " §6a terminé la course à la position §e" + place + " §6! Son chronomètre affichait §e" + Chrono.format(time));
+                        place ++;
                         Objects.requireNonNull(players.getVehicle()).remove();
                         players.setGameMode(GameMode.SPECTATOR);
                     }

@@ -60,38 +60,42 @@ public class Game {
         }
     }
 
-    public static void teleportReversedPodium(List<Player> podium) {
+    public static void reversedTeleportPodium(List<Player> podium) {
         Collections.reverse(podium);
-        for (Player player : podium) {
+        System.out.println(podium);
+        for (int i = 0; i < podium.size(); i++) {
+            Player player = podium.get(i);
             player.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -477.5, 64, -1242.5, -90, 0));
-            if (podium.size() >= 1){
-                podium.get(0).teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -466.5, 69, -1242.5, 90, 0));
-                WinFireworks.setWinner(podium.get(0));
+            if (podium.size() >= 1 && i == 0){
+                player.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -466.5, 69, -1242.5, 90, 0));
+                WinFireworks.setWinner(player);
                 WinFireworks winFireworks = new WinFireworks();
                 winFireworks.runTaskTimer(Olympiade.getInstance(), 0, 20);
             }
-            if (podium.size() >= 2){
-                podium.get(1).teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -467.5, 67, -1245.5, 90, 0));
+            if (podium.size() >= 2 && i == 1){
+                player.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -467.5, 67, -1245.5, 90, 0));
             }
-            if (podium.size() >= 3){
-                podium.get(2).teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -468.5, 66, -1239.5, 90, 0));
+            if (podium.size() >= 3 && i == 2){
+                player.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -468.5, 66, -1239.5, 90, 0));
             }
         }
     }
 
-    public static void giveReversedPoints(List<Player> podium){
-        Collections.reverse(podium);
-        for(int i = 0; i<podium.size(); i++){
-            if(i == 0){
-                addPoints(podium.get(i), 10);
-            }else if(i == 1){
-                addPoints(podium.get(i), 8);
-            }else if(i == 2){
-                addPoints(podium.get(i), 6);
-            }else if(i >= 3 && i < 10){
-                addPoints(podium.get(i), 5);
-            }else {
-                addPoints(podium.get(i), 2);
+    public static void reversedGivePoints(List<Player> podium) {
+        Collections.reverse(podium); // On inverse l'ordre de la liste
+        System.out.println(podium);
+        for (int i = 0; i < podium.size(); i++) {
+            Player player = podium.get(i);
+            if (i == 0) {
+                addPoints(player, 10);
+            } else if (i == 1) {
+                addPoints(player, 8);
+            } else if (i == 2) {
+                addPoints(player, 6);
+            } else if (i >= 3 && i < 10) {
+                addPoints(player, 5);
+            } else {
+                addPoints(player, 2);
             }
         }
     }

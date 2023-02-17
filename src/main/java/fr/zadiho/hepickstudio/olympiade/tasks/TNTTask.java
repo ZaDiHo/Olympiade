@@ -28,7 +28,7 @@ import java.util.List;
 
 public class TNTTask extends BukkitRunnable implements Listener {
 
-    private static int counter = 10;
+    private static int counter = 18;
     public static boolean played = false;
     public static int time = 0;
     private static List<Player> inTNT = new ArrayList<>();
@@ -89,7 +89,7 @@ public class TNTTask extends BukkitRunnable implements Listener {
 
     public static void resetRace() {
         setPlayed(false);
-        counter = 10;
+        counter = 18;
         time = 0;
         GameSettings.getTntPodium().clear();
         getInTNT().clear();
@@ -131,14 +131,21 @@ public class TNTTask extends BukkitRunnable implements Listener {
 
     @Override
     public void run() {
+        if(counter == 18){
+            fillFloors();
+            for (Player players : Bukkit.getOnlinePlayers()) {
+                players.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -196.5, 44, -810.5));
+                players.stopAllSounds();
+                players.playSound(players.getLocation(), Sound.MUSIC_DISC_CAT, 1, 1);
+                players.showPlayer(Olympiade.getInstance(), players);
+                players.getActivePotionEffects().clear();
+                alives.add(players);
+                getInTNT().add(players);
+            }
+        }
         if (counter == 10) {
             fillFloors();
             for (Player players : Bukkit.getOnlinePlayers()) {
-                players.stopAllSounds();
-                players.playSound(players.getLocation(), Sound.ENTITY_CAT_AMBIENT, 1, 1);
-                alives.add(players);
-                getInTNT().add(players);
-                players.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -196.5, 44, -810.5));
                 players.sendTitle("§cAttention !", "§6Placez vous devant la ligne de départ !", 10, 20, 10);
             }
         }
@@ -197,17 +204,17 @@ public class TNTTask extends BukkitRunnable implements Listener {
 
             if (alives.size() == 1) {
                 for (Player players : GameSettings.getGamePlayers()) {
-                    GameSettings.getTntPodium().add(alives.get(0));
-                    getInTNT().remove(alives.get(0));
                     players.sendTitle("§cTntRun terminé !", "§6Victoire de §e" + alives.get(0).getDisplayName(), 10, 100, 10);
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
                     players.setGameMode(GameMode.ADVENTURE);
-                    EGames.setState(EGames.WAITING);
-                    setPlayed(true);
                 }
-                Game.teleportReversedPodium(GameSettings.getTntPodium());
-                Game.giveReversedPoints(GameSettings.getTntPodium());
+                GameSettings.getTntPodium().add(alives.get(0));
+                getInTNT().remove(alives.get(0));
+                EGames.setState(EGames.WAITING);
+                setPlayed(true);
+                Game.reversedTeleportPodium(GameSettings.getTntPodium());
+                Game.reversedGivePoints(GameSettings.getTntPodium());
                 cancel();
             }
             if (time / 60 >= EGames.TNT.getDuration()) {
@@ -219,8 +226,8 @@ public class TNTTask extends BukkitRunnable implements Listener {
                     EGames.setState(EGames.WAITING);
                     setPlayed(true);
                 }
-                Game.teleportReversedPodium(GameSettings.getTntPodium());
-                Game.giveReversedPoints(GameSettings.getTntPodium());
+                Game.reversedTeleportPodium(GameSettings.getTntPodium());
+                Game.reversedGivePoints(GameSettings.getTntPodium());
                 cancel();
             }
             time++;

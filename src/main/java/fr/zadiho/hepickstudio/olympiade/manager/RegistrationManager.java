@@ -4,6 +4,7 @@ import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.commands.GameCommand;
 import fr.zadiho.hepickstudio.olympiade.commands.HostCommand;
 import fr.zadiho.hepickstudio.olympiade.commands.SpawnCommand;
+import fr.zadiho.hepickstudio.olympiade.listeners.GeneralEvents;
 import fr.zadiho.hepickstudio.olympiade.listeners.PlayerJoin;
 import fr.zadiho.hepickstudio.olympiade.listeners.PlayerQuit;
 import fr.zadiho.hepickstudio.olympiade.tasks.*;
@@ -29,6 +30,7 @@ public class RegistrationManager {
 
         this.listeners.add(new PlayerJoin());
         this.listeners.add(new PlayerQuit());
+        this.listeners.add(new GeneralEvents());
         this.listeners.add(new TNTTask());
         this.listeners.add(new PVPTask());
         this.listeners.add(new SurpriseTask());
