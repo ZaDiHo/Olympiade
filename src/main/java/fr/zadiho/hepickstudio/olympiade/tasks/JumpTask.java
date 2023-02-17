@@ -123,12 +123,10 @@ public class JumpTask extends BukkitRunnable implements Listener {
         if (counter == 20) {
             Cuboid.fillStartJump();
             for (Player players : Bukkit.getOnlinePlayers()) {
-
                 hidePlayer.put(players, false);
                 getInJump().add(players);
                 checkPoints.put(players, 1);
                 players.teleport(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1147.5, 67, 41.5, -90, 0));
-
                 players.getInventory().setItem(7, new ItemBuilder(Material.DARK_OAK_DOOR).setName("§6Retour au checkpoint").toItemStack());
                 players.getInventory().setItem(8, new ItemBuilder(Material.LIGHT_BLUE_DYE).setName("§6Masquer les joueurs").toItemStack());
                 players.stopAllSounds();

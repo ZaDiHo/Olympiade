@@ -190,7 +190,6 @@ public class TNTTask extends BukkitRunnable implements Listener {
                 if (players.isVisualFire()) {
                     players.setVisualFire(false);
                 }
-
                 if (endTNT.isIn(players)) {
                     if (getInTNT().contains(players)) {
                         getInTNT().remove(players);
@@ -223,9 +222,9 @@ public class TNTTask extends BukkitRunnable implements Listener {
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
                     players.setGameMode(GameMode.ADVENTURE);
-                    EGames.setState(EGames.WAITING);
-                    setPlayed(true);
                 }
+                EGames.setState(EGames.WAITING);
+                setPlayed(true);
                 Game.reversedTeleportPodium(GameSettings.getTntPodium());
                 Game.reversedGivePoints(GameSettings.getTntPodium());
                 cancel();

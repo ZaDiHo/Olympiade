@@ -4,6 +4,7 @@ import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
 import fr.zadiho.hepickstudio.olympiade.game.Game;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
+import fr.zadiho.hepickstudio.olympiade.game.pve.EPVE;
 import fr.zadiho.hepickstudio.olympiade.utils.Cuboid;
 import fr.zadiho.hepickstudio.olympiade.utils.ItemBuilder;
 import org.bukkit.*;
@@ -16,16 +17,13 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.units.qual.C;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class PVETask extends BukkitRunnable implements Listener {
 
@@ -34,21 +32,17 @@ public class PVETask extends BukkitRunnable implements Listener {
     private static Cuboid arene = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3"), -971.5, 55, -935), new Location(Bukkit.getWorld("OlympiadeS3"), -1183.5, -6, -731.5));
     public static int time = 0;
     private static List<Player> inPVE = new ArrayList<>();
-    private static List<Player> inRound = new ArrayList<>();
     public static int round = 0;
 
     public static ArrayList<Player> alives = new ArrayList<>();
-    public static int entities = 0;
-
-    public static int getRound() {
-        return round;
-    }
+    public static int entities;
 
     public static void resetPVE() {
         setPlayed(false);
         counter = 16;
         alives.clear();
         time = 0;
+        EPVE.setCurrentRound(EPVE.ROUND1);
         GameSettings.getPvePodium().clear();
         getInPVE().clear();
     }
@@ -84,17 +78,14 @@ public class PVETask extends BukkitRunnable implements Listener {
     @EventHandler
     public void onEat(EntityChangeBlockEvent event) {
         if (EGames.getCurrentState().equals(EGames.PVE)) {
-            if (event.getEntity().getType() == EntityType.WITHER_SKULL) {
-                event.setCancelled(true);
-            }
-            if (event.getEntity().getType() == EntityType.WITHER) {
+            if(event.getEntity().getType() == EntityType.ENDER_DRAGON || event.getEntity().getType() == EntityType.WITHER_SKULL || event.getEntity().getType() == EntityType.WITHER || event.getEntity().getType() == EntityType.FIREBALL) {
                 event.setCancelled(true);
             }
         }
     }
 
     public static void startRound() {
-        if (round == 1) {
+        if (EPVE.getCurrentRound().equals(EPVE.ROUND1)) {
             for (int i = 125; i > 0; i--) {
                 Location loc = randomLoc();
                 while (!isAirLocation(loc)) {
@@ -125,7 +116,7 @@ public class PVETask extends BukkitRunnable implements Listener {
             }
         }
 
-        if (round == 2) {
+        if (EPVE.getCurrentRound().equals(EPVE.ROUND2)) {
             Location loca = randomLoc();
             while (!isAirLocation(loca)) {
                 loca = randomLoc();
@@ -162,7 +153,7 @@ public class PVETask extends BukkitRunnable implements Listener {
             wither.setCustomName("§cWither");
             wither.setCustomNameVisible(true);
         }
-        if (round == 3) {
+        if (EPVE.getCurrentRound().equals(EPVE.ROUND3)) {
             for (int i = 75; i > 0; i--) {
                 Location loc = randomLoc();
                 while (!isAirLocation(loc)) {
@@ -190,21 +181,24 @@ public class PVETask extends BukkitRunnable implements Listener {
                 witherSkeleton.setCustomNameVisible(true);
             }
         }
-        if (round == 4) {
+        if (EPVE.getCurrentRound().equals(EPVE.ROUND4)) {
             for (int i = 50; i > 0; i--) {
                 Location loc = randomLoc();
                 while (!isAirLocation(loc)) {
                     loc = randomLoc();
                 }
-                EnderDragon enderDragon = (EnderDragon) Bukkit.getWorld("OlympiadeS3").spawnEntity(loc, EntityType.ENDER_DRAGON);
                 WitherSkeleton witherSkeleton = (WitherSkeleton) Bukkit.getWorld("OlympiadeS3").spawnEntity(loc, EntityType.WITHER_SKELETON);
                 Blaze blaze = (Blaze) Bukkit.getWorld("OlympiadeS3").spawnEntity(loc, EntityType.BLAZE);
                 Stray stray = (Stray) Bukkit.getWorld("OlympiadeS3").spawnEntity(loc, EntityType.STRAY);
                 Husk husk = (Husk) Bukkit.getWorld("OlympiadeS3").spawnEntity(loc, EntityType.HUSK);
-
-                enderDragon.setGlowing(true);
-                enderDragon.setCustomName("§cEnder dragon");
-                enderDragon.setCustomNameVisible(true);
+                if(i == 1){
+                    EnderDragon enderDragon = (EnderDragon) Bukkit.getWorld("OlympiadeS3").spawnEntity(loc, EntityType.ENDER_DRAGON);
+                    enderDragon.setGlowing(true);
+                    enderDragon.setCustomName("§cEnder dragon");
+                    enderDragon.setCustomNameVisible(true);
+                    enderDragon.setAI(true);
+                    enderDragon.setTarget(Bukkit.getPlayer(alives.get(0).getName()));
+                }
 
                 witherSkeleton.setGlowing(true);
                 witherSkeleton.setCustomName("§cWither squelette");
@@ -215,15 +209,15 @@ public class PVETask extends BukkitRunnable implements Listener {
                 blaze.setCustomNameVisible(true);
 
                 stray.setGlowing(true);
-                stray.setCustomName("§cPingouin brutal");
+                stray.setCustomName("§cStray");
                 stray.setCustomNameVisible(true);
 
                 husk.setGlowing(true);
-                husk.setCustomName("§cPingouin");
+                husk.setCustomName("§cHusk");
                 husk.setCustomNameVisible(true);
             }
         }
-        if (round == 5) {
+        if (EPVE.getCurrentRound().equals(EPVE.ROUND5)) {
             for (int i = 50; i > 0; i--) {
                 Location loc = randomLoc();
                 while (!isAirLocation(loc)) {
@@ -256,13 +250,7 @@ public class PVETask extends BukkitRunnable implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
         if (EGames.getCurrentState().equals(EGames.PVE)) {
-            if (event.getCause().equals(EntityDamageEvent.DamageCause.FALL)) {
-                event.setCancelled(true);
-            }
-            if (event.getCause().equals(EntityDamageEvent.DamageCause.FIRE)) {
-                event.setCancelled(true);
-            }
-            if (event.getCause().equals(EntityDamageEvent.DamageCause.FIRE_TICK)) {
+            if (event.getCause().equals(EntityDamageEvent.DamageCause.FALL) || event.getCause().equals(EntityDamageEvent.DamageCause.FIRE) || event.getCause().equals(EntityDamageEvent.DamageCause.FIRE_TICK)) {
                 event.setCancelled(true);
             }
             if (counter > -10) {
@@ -275,7 +263,7 @@ public class PVETask extends BukkitRunnable implements Listener {
     public void onDeath(EntityDeathEvent event) {
         if (EGames.getCurrentState().equals(EGames.PVE)) {
             Player killer = event.getEntity().getKiller();
-            if (getRound() == 1) {
+            if (EPVE.getCurrentRound().equals(EPVE.ROUND1)) {
                 if (event.getEntity().getType() == EntityType.SKELETON) {
                     GameSettings.getPvePodium().put(killer, GameSettings.getPvePodium().get(killer) + 1);
                     entities -= 1;
@@ -293,7 +281,7 @@ public class PVETask extends BukkitRunnable implements Listener {
                     entities -= 1;
                 }
             }
-            if (getRound() == 2) {
+            if (EPVE.getCurrentRound().equals(EPVE.ROUND2)) {
                 if (event.getEntity().getType() == EntityType.PILLAGER) {
                     GameSettings.getPvePodium().put(killer, GameSettings.getPvePodium().get(killer) + 1);
                     entities -= 1;
@@ -315,7 +303,7 @@ public class PVETask extends BukkitRunnable implements Listener {
                     entities -= 1;
                 }
             }
-            if (getRound() == 3) {
+            if (EPVE.getCurrentRound().equals(EPVE.ROUND3)) {
                 if (event.getEntity().getType() == EntityType.SLIME) {
                     GameSettings.getPvePodium().put(killer, GameSettings.getPvePodium().get(killer) + 1);
                     entities -= 1;
@@ -333,7 +321,7 @@ public class PVETask extends BukkitRunnable implements Listener {
                     entities -= 1;
                 }
             }
-            if (getRound() == 4) {
+            if (EPVE.getCurrentRound().equals(EPVE.ROUND4)) {
                 if (event.getEntity().getType() == EntityType.ENDER_DRAGON) {
                     GameSettings.getPvePodium().put(killer, GameSettings.getPvePodium().get(killer) + 1);
                     entities -= 1;
@@ -355,13 +343,35 @@ public class PVETask extends BukkitRunnable implements Listener {
                     entities -= 1;
                 }
             }
-            if (getRound() == 5) {
+            if (EPVE.getCurrentRound().equals(EPVE.ROUND5)) {
                 if (event.getEntity().getType() == EntityType.WARDEN) {
                     GameSettings.getPvePodium().put(killer, GameSettings.getPvePodium().get(killer) + 1);
                     entities -= 1;
                 }
             }
         }
+    }
+
+    private void removeEntities(){
+        removeEntityTypes(EntityType.ZOMBIE);
+        removeEntityTypes(EntityType.SKELETON);
+        removeEntityTypes(EntityType.SPIDER);
+        removeEntityTypes(EntityType.FROG);
+        removeEntityTypes(EntityType.PILLAGER);
+        removeEntityTypes(EntityType.VINDICATOR);
+        removeEntityTypes(EntityType.VEX);
+        removeEntityTypes(EntityType.ALLAY);
+        removeEntityTypes(EntityType.WITHER);
+        removeEntityTypes(EntityType.WITCH);
+        removeEntityTypes(EntityType.SLIME);
+        removeEntityTypes(EntityType.PHANTOM);
+        removeEntityTypes(EntityType.WITHER_SKELETON);
+        removeEntityTypes(EntityType.ENDER_DRAGON);
+        removeEntityTypes(EntityType.WITHER_SKELETON);
+        removeEntityTypes(EntityType.BLAZE);
+        removeEntityTypes(EntityType.STRAY);
+        removeEntityTypes(EntityType.HUSK);
+        removeEntityTypes(EntityType.WARDEN);
     }
 
     @EventHandler
@@ -389,11 +399,13 @@ public class PVETask extends BukkitRunnable implements Listener {
     @Override
     public void run() {
         if (counter == 16) {
+            Bukkit.getWorld("OlympiadeS3").setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+            Bukkit.getWorld("OlympiadeS3").setPVP(false);
+            removeEntities();
             for (Player players : Bukkit.getOnlinePlayers()) {
                 players.stopAllSounds();
-                Bukkit.getWorld("OlympiadeS3").setPVP(false);
                 players.showPlayer(Olympiade.getInstance(), players);
-                players.getActivePotionEffects().clear();
+                players.setGlowing(false);
                 players.playSound(players.getLocation(), Sound.ENTITY_CAT_AMBIENT, 1, 1);
                 players.setGameMode(GameMode.SURVIVAL);
                 alives.add(players);
@@ -441,7 +453,7 @@ public class PVETask extends BukkitRunnable implements Listener {
         }
         if (counter == 0) {
             for (Player players : Bukkit.getOnlinePlayers()) {
-                round = 1;
+                EPVE.setCurrentRound(EPVE.ROUND1);
                 entities = 10;
                 players.playSound(players.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
                 players.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -1080.5, 50, -844.5, -180, 0));
@@ -462,57 +474,89 @@ public class PVETask extends BukkitRunnable implements Listener {
                 }
             }
             if (entities <= 0) {
-                if (getRound() == 1 && entities <= 0) {
-                    removeEntityTypes(EntityType.ZOMBIE);
-                    removeEntityTypes(EntityType.SKELETON);
-                    removeEntityTypes(EntityType.SPIDER);
-                    removeEntityTypes(EntityType.FROG);
-                    Bukkit.broadcastMessage("Fin de la vague 1, préparez vous à la vague 2");
-                    round = 2;
-                    entities = 10;
+                if (EPVE.getCurrentRound().equals(EPVE.ROUND1)) {
+                    removeEntities();
+                    Bukkit.broadcastMessage("§cFin de la vague 1, préparez vous à la vague 2");
+                    for(Player players : Bukkit.getOnlinePlayers()) {
+                        players.playSound(players.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                        players.playSound(players.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+                    }
+                    EPVE.setCurrentRound(EPVE.ROUND2);
+                    entities = EPVE.ROUND2.getEntities();
                     Bukkit.getScheduler().runTaskLater(Olympiade.getInstance(), new Runnable() {
                         @Override
                         public void run() {
+                            for(Player players : Bukkit.getOnlinePlayers()) {
+                                players.playSound(players.getLocation(), Sound.ENTITY_WITHER_DEATH, 1, 1);
+                            }
                             startRound();
                             Bukkit.broadcastMessage("C'est parti pour la vague 2 !");
                         }
                     }, 20 * 10);
                 }
-                if (getRound() == 2 && entities <= 0) {
-                    removeEntityTypes(EntityType.PILLAGER);
-                    removeEntityTypes(EntityType.VINDICATOR);
-                    removeEntityTypes(EntityType.VEX);
-                    removeEntityTypes(EntityType.ALLAY);
-                    removeEntityTypes(EntityType.WITHER);
-                    Bukkit.broadcastMessage("Fin de la vague 2, préparez vous à la vague 3");
-                    round = 3;
-                    entities = 10;
-                    startRound();
+                if (EPVE.getCurrentRound().equals(EPVE.ROUND2) && entities <= 0) {
+                    removeEntities();
+                    Bukkit.broadcastMessage("§cFin de la vague 2, préparez vous à la vague 3");
+                    for(Player players : Bukkit.getOnlinePlayers()) {
+                        players.playSound(players.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                        players.playSound(players.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+                    }
+                    EPVE.setCurrentRound(EPVE.ROUND3);
+                    entities = EPVE.ROUND3.getEntities();
+                    Bukkit.getScheduler().runTaskLater(Olympiade.getInstance(), new Runnable() {
+                        @Override
+                        public void run() {
+                            for(Player players : Bukkit.getOnlinePlayers()) {
+                                players.playSound(players.getLocation(), Sound.ENTITY_WITHER_DEATH, 1, 1);
+                            }
+                            startRound();
+                            Bukkit.broadcastMessage("C'est parti pour la vague 3 !");
+                        }
+                    }, 20 * 10);
                 }
-                if (getRound() == 3 && entities <= 0) {
-                    removeEntityTypes(EntityType.WITCH);
-                    removeEntityTypes(EntityType.SLIME);
-                    removeEntityTypes(EntityType.PHANTOM);
-                    removeEntityTypes(EntityType.WITHER_SKELETON);
-                    Bukkit.broadcastMessage("Fin de la vague 3, préparez vous à la vague 4");
-                    round = 4;
-                    entities = 10;
-                    startRound();
+                if (EPVE.getCurrentRound().equals(EPVE.ROUND3) && entities <= 0) {
+                    removeEntities();
+                    Bukkit.broadcastMessage("§cFin de la vague 3, préparez vous à la vague 4");
+                    for(Player players : Bukkit.getOnlinePlayers()) {
+                        players.playSound(players.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                        players.playSound(players.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+                    }
+                    EPVE.setCurrentRound(EPVE.ROUND4);
+                    entities = EPVE.ROUND4.getEntities();
+                    Bukkit.getScheduler().runTaskLater(Olympiade.getInstance(), new Runnable() {
+                        @Override
+                        public void run() {
+                            for(Player players : Bukkit.getOnlinePlayers()) {
+                                players.playSound(players.getLocation(), Sound.ENTITY_WITHER_DEATH, 1, 1);
+                            }
+                            startRound();
+                            Bukkit.broadcastMessage("C'est parti pour la vague 4 !");
+                        }
+                    }, 20 * 10);
                 }
-                if (getRound() == 4 && entities <= 0) {
-                    removeEntityTypes(EntityType.ENDER_DRAGON);
-                    removeEntityTypes(EntityType.WITHER_SKELETON);
-                    removeEntityTypes(EntityType.BLAZE);
-                    removeEntityTypes(EntityType.STRAY);
-                    removeEntityTypes(EntityType.HUSK);
-                    Bukkit.broadcastMessage("Fin de la vague 4, préparez vous à la vague 5");
-                    round = 5;
-                    entities = 10;
-                    startRound();
+                if (EPVE.getCurrentRound().equals(EPVE.ROUND4) && entities <= 0) {
+                    removeEntities();
+                    Bukkit.broadcastMessage("§cFin de la vague 4, préparez vous à la vague 5");
+                    for(Player players : Bukkit.getOnlinePlayers()) {
+                        players.playSound(players.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                        players.playSound(players.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+                    }
+                    EPVE.setCurrentRound(EPVE.ROUND5);
+                    entities = EPVE.ROUND5.getEntities();
+                    Bukkit.getScheduler().runTaskLater(Olympiade.getInstance(), new Runnable() {
+                        @Override
+                        public void run() {
+                            for(Player players : Bukkit.getOnlinePlayers()) {
+                                players.playSound(players.getLocation(), Sound.ENTITY_WITHER_DEATH, 1, 1);
+                            }
+                            startRound();
+                            Bukkit.broadcastMessage("C'est parti pour la vague 5 !");
+                        }
+                    }, 20 * 10);
                 }
-                if (getRound() == 5 && entities <= 0) {
-                    removeEntityTypes(EntityType.WARDEN);
-                    Bukkit.broadcastMessage("Fin de la vague 5, préparez vous à la vague 2");
+                if (EPVE.getCurrentRound().equals(EPVE.ROUND5) && entities <= 0) {
+                    removeEntities();
+                    Bukkit.broadcastMessage("Fin de la vague 5 !");
                     for (Player players : GameSettings.getGamePlayers()) {
                         players.sendTitle("§cPVE Terminé !", "§6Toutes les vagues ont été terminées !", 10, 100, 10);
                         players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
@@ -528,96 +572,83 @@ public class PVETask extends BukkitRunnable implements Listener {
             }
 
             if (alives.size() == 0) {
+                removeEntities();
                 for (Player players : GameSettings.getGamePlayers()) {
-                    if (getRound() == 1) {
-                        removeEntityTypes(EntityType.ZOMBIE);
-                        removeEntityTypes(EntityType.SKELETON);
-                        removeEntityTypes(EntityType.SPIDER);
-                        removeEntityTypes(EntityType.FROG);
+                    if (EPVE.getCurrentRound().equals(EPVE.ROUND1)) {
+                        alives.add(players);
                         players.sendTitle("§cDéfaite!", "§6Vous n'avez pas remporté cette vague...", 10, 100, 10);
                         players.playSound(players.getLocation(), Sound.ENTITY_CAT_HISS, 1, 1);
                         equipPlayer(players);
                         players.setGameMode(GameMode.SURVIVAL);
                         players.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -1080.5, 50, -844.5, -180, 0));
                         Bukkit.broadcastMessage("Fin de la vague 1, préparez vous à la vague 2");
-                        round = 2;
-                        entities = 10;
+                        entities = EPVE.ROUND2.getEntities();
                         Bukkit.getScheduler().runTaskLater(Olympiade.getInstance(), new Runnable() {
                             @Override
                             public void run() {
+                                removeEntities();
+                                EPVE.setCurrentRound(EPVE.ROUND2);
                                 startRound();
                                 Bukkit.broadcastMessage("C'est parti pour la vague 2 !");
                             }
                         }, 20 * 10);
                     }
-                    if (getRound() == 2) {
-                        removeEntityTypes(EntityType.PILLAGER);
-                        removeEntityTypes(EntityType.VINDICATOR);
-                        removeEntityTypes(EntityType.VEX);
-                        removeEntityTypes(EntityType.ALLAY);
-                        removeEntityTypes(EntityType.WITHER);
+                    if (EPVE.getCurrentRound().equals(EPVE.ROUND2)) {
                         players.sendTitle("§cDéfaite!", "§6Vous n'avez pas remporté cette vague...", 10, 100, 10);
                         players.playSound(players.getLocation(), Sound.ENTITY_CAT_HISS, 1, 1);
                         equipPlayer(players);
                         players.setGameMode(GameMode.SURVIVAL);
                         players.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -1080.5, 50, -844.5, -180, 0));
                         Bukkit.broadcastMessage("Fin de la vague 2, préparez vous à la vague 3");
-                        round = 3;
-                        entities = 10;
+                        entities = EPVE.ROUND3.getEntities();
                         Bukkit.getScheduler().runTaskLater(Olympiade.getInstance(), new Runnable() {
                             @Override
                             public void run() {
+                                removeEntities();
+                                EPVE.setCurrentRound(EPVE.ROUND3);
                                 startRound();
                                 Bukkit.broadcastMessage("C'est parti pour la vague 3 !");
                             }
                         }, 20 * 10);
                     }
-                    if (getRound() == 3) {
-                        removeEntityTypes(EntityType.WITCH);
-                        removeEntityTypes(EntityType.SLIME);
-                        removeEntityTypes(EntityType.PHANTOM);
-                        removeEntityTypes(EntityType.WITHER_SKELETON);
+                    if (EPVE.getCurrentRound().equals(EPVE.ROUND3)) {
                         players.sendTitle("§cDéfaite!", "§6Vous n'avez pas remporté cette vague...", 10, 100, 10);
                         players.playSound(players.getLocation(), Sound.ENTITY_CAT_HISS, 1, 1);
                         equipPlayer(players);
                         players.setGameMode(GameMode.SURVIVAL);
                         players.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -1080.5, 50, -844.5, -180, 0));
                         Bukkit.broadcastMessage("Fin de la vague 3, préparez vous à la vague 4");
-                        round = 4;
-                        entities = 10;
+                        entities = EPVE.ROUND4.getEntities();
                         Bukkit.getScheduler().runTaskLater(Olympiade.getInstance(), new Runnable() {
                             @Override
                             public void run() {
+                                removeEntities();
+                                EPVE.setCurrentRound(EPVE.ROUND4);
                                 startRound();
                                 Bukkit.broadcastMessage("C'est parti pour la vague 4 !");
                             }
                         }, 20 * 10);
                     }
-                    if (getRound() == 4) {
-                        removeEntityTypes(EntityType.ENDER_DRAGON);
-                        removeEntityTypes(EntityType.WITHER_SKELETON);
-                        removeEntityTypes(EntityType.BLAZE);
-                        removeEntityTypes(EntityType.STRAY);
-                        removeEntityTypes(EntityType.HUSK);
+                    if (EPVE.getCurrentRound().equals(EPVE.ROUND4)) {
                         players.sendTitle("§cDéfaite!", "§6Vous n'avez pas remporté cette vague...", 10, 100, 10);
                         players.playSound(players.getLocation(), Sound.ENTITY_CAT_HISS, 1, 1);
                         equipPlayer(players);
                         players.setGameMode(GameMode.SURVIVAL);
                         players.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -1080.5, 50, -844.5, -180, 0));
                         Bukkit.broadcastMessage("Fin de la vague 4, préparez vous à la vague 5");
-                        round = 5;
-                        entities = 10;
+                        entities = EPVE.ROUND5.getEntities();
                         Bukkit.getScheduler().runTaskLater(Olympiade.getInstance(), new Runnable() {
                             @Override
                             public void run() {
+                                removeEntities();
+                                EPVE.setCurrentRound(EPVE.ROUND5);
                                 startRound();
                                 Bukkit.broadcastMessage("C'est parti pour la vague 5 !");
                             }
                         }, 20 * 10);
                     }
-                    if (getRound() == 5) {
-                        removeEntityTypes(EntityType.WARDEN);
-                        Bukkit.broadcastMessage("Fin de la vague 5, préparez vous à la vague 2");
+                    if (EPVE.getCurrentRound().equals(EPVE.ROUND5)) {
+                        removeEntities();
                         players.sendTitle("§cPVE Terminé !", "§6Toutes les vagues ont été terminées !", 10, 100, 10);
                         players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                         players.getInventory().clear();
