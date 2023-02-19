@@ -13,6 +13,7 @@ import fr.zadiho.hepickstudio.olympiade.utils.Cuboid;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.WorldBorder;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -53,11 +54,17 @@ public class OlympiadeTask extends BukkitRunnable implements Listener {
     public void run() {
         for(Player players : GameSettings.getGamePlayers()){
             if((EGames.getCurrentState() == EGames.WAITING || EGames.getCurrentState() == EGames.PVE && !(GameSettings.getHostPlayers().contains(players)))){
+                players.setVisualFire(false);
+                players.showPlayer(Olympiade.getInstance(), players);
                 if(!(players.getGameMode() == GameMode.ADVENTURE)){
                     players.setGameMode(GameMode.ADVENTURE);
                 }
             }
 
+        }
+        if(!(EGames.getCurrentState() == EGames.PVE)){
+            WorldBorder worldBorder = Bukkit.getWorld("OlympiadeS3").getWorldBorder();
+            worldBorder.setSize(999999999);
         }
         if((EGames.getCurrentState() == EGames.WAITING || EGames.getCurrentState() == EGames.RACE || EGames.getCurrentState() == EGames.PVE || EGames.getCurrentState() == EGames.PARKOUR)){
             Bukkit.getWorld("OlympiadeS3").setPVP(false);

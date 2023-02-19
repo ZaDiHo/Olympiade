@@ -51,7 +51,7 @@ public class PVEGUI implements InventoryProvider {
                 .setName("§8§l§8» §a§lC'est parti !")
                 .toItemStack(), e -> {
             AdminGUI.SMART_INVENTORY.open(player);
-            if(PVPTask.isPlayed() || EGames.getCurrentState().equals(EGames.PVE)){
+            if(PVETask.isPlayed() || EGames.getCurrentState().equals(EGames.PVE)){
                 if(PVPTask.isPlayed()){
                     player.sendMessage("§cL'épreuve à déjà été faite, vous pouvez cependant la réinitialiser.");
                 }

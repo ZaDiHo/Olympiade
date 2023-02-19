@@ -9,6 +9,7 @@ import fr.zadiho.hepickstudio.olympiade.utils.Cuboid;
 import fr.zadiho.hepickstudio.olympiade.utils.Holograms;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -62,6 +63,11 @@ public final class Olympiade extends JavaPlugin {
 
         inventoryManager = new InventoryManager(this);
         inventoryManager.init();
+
+        Bukkit.getWorld("OlympiadeS3").setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+        Bukkit.getWorld("OlympiadeS3_nether").setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+        Bukkit.getWorld("OlympiadeS3_the_end").setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+
 
         super.onEnable();
     }

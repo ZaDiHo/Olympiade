@@ -124,9 +124,9 @@ public class AdminGUI implements InventoryProvider {
         contents.set(0, 4, player_head_item);
         contents.set(2, 2, jump);
         contents.set(2, 3, race);
-        contents.set(2, 4, pve);
-        contents.set(2, 5, tnt);
-        contents.set(2, 6, pvp);
+        contents.set(2, 4, tnt);
+        contents.set(2, 5, pvp);
+        contents.set(2, 6, pve);
         contents.set(2, 8, surprise);
         contents.set(4, 4, leave);
 

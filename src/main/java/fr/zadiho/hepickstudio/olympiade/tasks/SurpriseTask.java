@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -98,8 +99,20 @@ public class SurpriseTask extends BukkitRunnable implements Listener {
     }
 
     @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event){
+        if(EGames.getCurrentState().equals(EGames.SURPRISE)){
+            if(getInSurprise().contains(event.getEntity().getPlayer())){
+                getInSurprise().remove(event.getEntity().getPlayer());
+                event.getDrops().clear();
+                Bukkit.broadcastMessage("§c" + event.getEntity().getName() + " §6est mort ! Il reste §c" + (getInSurprise().size() - 1) + " §6joueurs en vie !");
+                event.getEntity().getPlayer().setGameMode(GameMode.SPECTATOR);
+            }
+        }
+    }
+
+    @EventHandler
     public void onDeath(EntityDeathEvent event) {
-        if (EGames.getCurrentState().equals(EGames.PVP)) {
+        if (EGames.getCurrentState().equals(EGames.SURPRISE)) {
             if (event.getEntity() instanceof Player player) {
                 if (getInSurprise().contains(player)) {
                     getInSurprise().remove(player);

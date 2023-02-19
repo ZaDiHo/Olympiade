@@ -52,7 +52,7 @@ public class SurpriseGUI implements InventoryProvider {
                 .setName("§8§l§8» §a§lC'est parti !")
                 .toItemStack(), e -> {
             AdminGUI.SMART_INVENTORY.open(player);
-            if (JumpTask.isPlayed() || EGames.getCurrentState().equals(EGames.SURPRISE)) {
+            if (EGames.getCurrentState().equals(EGames.SURPRISE)) {
                 if (JumpTask.isPlayed()) {
                     player.sendMessage("§cL'épreuve à déjà été faite, vous pouvez cependant la réinitialiser.");
                 }

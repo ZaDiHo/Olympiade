@@ -79,7 +79,9 @@ public class PVPTask extends BukkitRunnable implements Listener {
     public void onDeath(EntityDeathEvent event) {
         if (EGames.getCurrentState().equals(EGames.PVP)) {
             if (event.getEntity() instanceof Player player) {
-                upgradeStuff(player.getKiller());
+                if(player.getKiller() != null){
+                    upgradeStuff(player.getKiller());
+                }
                 if (getInPVP().contains(player)) {
                     alives.remove(player);
                     getInPVP().remove(player);
@@ -235,15 +237,48 @@ public class PVPTask extends BukkitRunnable implements Listener {
                 teleportPlayersCircle(alives);
                 equipPlayer(players);
             }
+            WorldBorder worldBorder = Bukkit.getWorld("OlympiadeS3").getWorldBorder();
+            worldBorder.setCenter(-1803.5, -1435.5);
+            worldBorder.setSize(400);
+
+            int warningTimeSeconds = 5;
+            int warningDistanceBlocks = 10;
+
+            worldBorder.setSize(400);
+            worldBorder.setWarningTime(warningTimeSeconds);
+            worldBorder.setWarningDistance(warningDistanceBlocks);
 
 
         }
         if (counter == -10) {
-            Bukkit.broadcastMessage("§cAttention ! La période d'invinibilité est terminée !");
+            Bukkit.broadcastMessage("§cAttention ! La période d'invincibilité est terminée !");
             for(Player players : alives) {
                 players.playSound(players.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1, 1);
             }
             Bukkit.getWorld("OlympiadeS3").setPVP(true);
+        }
+        if (counter == -60) {
+            Bukkit.broadcastMessage("§cActivation de la bordure dans 5 minutes.");
+            for(Player players : alives) {
+                players.playSound(players.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1, 1);
+            }
+        }
+        if(counter == -300) {
+            Bukkit.broadcastMessage("§cAttention ! La bordure se réduit !");
+            for(Player players : alives) {
+                players.playSound(players.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1, 1);
+            }
+            WorldBorder worldBorder = Bukkit.getWorld("OlympiadeS3").getWorldBorder();
+            worldBorder.setCenter(-1803.5, -1435.5);
+            worldBorder.setSize(400);
+
+            int durationSeconds = 10 * 60;
+            int warningTimeSeconds = 5;
+            int warningDistanceBlocks = 10;
+
+            worldBorder.setSize(50, durationSeconds);
+            worldBorder.setWarningTime(warningTimeSeconds);
+            worldBorder.setWarningDistance(warningDistanceBlocks);
         }
         if (counter < 0) {
             for (Player players : GameSettings.getGamePlayers()) {

@@ -4,6 +4,7 @@ import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
 import fr.zadiho.hepickstudio.olympiade.game.Game;
 import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
+import fr.zadiho.hepickstudio.olympiade.game.pve.EPVE;
 import fr.zadiho.hepickstudio.olympiade.utils.Chrono;
 import fr.zadiho.hepickstudio.olympiade.utils.Cuboid;
 import fr.zadiho.hepickstudio.olympiade.utils.ItemBuilder;
@@ -123,6 +124,7 @@ public class JumpTask extends BukkitRunnable implements Listener {
         if (counter == 20) {
             Cuboid.fillStartJump();
             for (Player players : Bukkit.getOnlinePlayers()) {
+                EPVE.setCurrentRound(EPVE.ROUND1);
                 hidePlayer.put(players, false);
                 getInJump().add(players);
                 checkPoints.put(players, 1);

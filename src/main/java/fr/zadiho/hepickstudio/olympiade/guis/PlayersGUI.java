@@ -45,7 +45,6 @@ public class PlayersGUI implements InventoryProvider {
                     .addLoreLine("§8⭓ §fGrade: §e" + Game.getPlayerPrefix(target))
                     .addLoreLine("§8⭓ §fPoints: §e" + GameSettings.getPodium().get(target))
                     .addLoreLine("§8⭓ §fClassements: §e" + GameSettings.getPlace(target))
-                    .addLoreLine("§8⭓ §fKills: §e0")
                     .addLoreLine("§8§m-----------------------")
                     .addLoreLine("§8§l§8» §cCliquez pour vous y §ntéléporter.")
                     .toItemStack(), e -> {
