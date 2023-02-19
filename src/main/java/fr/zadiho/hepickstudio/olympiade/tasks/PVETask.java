@@ -23,6 +23,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -195,8 +196,8 @@ public class PVETask extends BukkitRunnable implements Listener {
                 }
                 WitherSkeleton witherSkeleton = (WitherSkeleton) Bukkit.getWorld("OlympiadeS3").spawnEntity(loc, EntityType.WITHER_SKELETON);
                 Blaze blaze = (Blaze) Bukkit.getWorld("OlympiadeS3").spawnEntity(loc, EntityType.BLAZE);
-                Stray stray = (Stray) Bukkit.getWorld("OlympiadeS3").spawnEntity(loc, EntityType.STRAY);
-                Husk husk = (Husk) Bukkit.getWorld("OlympiadeS3").spawnEntity(loc, EntityType.HUSK);
+                Piglin piglin = (Piglin) Bukkit.getWorld("OlympiadeS3").spawnEntity(loc, EntityType.PIGLIN);
+                PiglinBrute piglinBrute = (PiglinBrute) Bukkit.getWorld("OlympiadeS3").spawnEntity(loc, EntityType.PIGLIN_BRUTE);
                 Enderman enderman = (Enderman) Bukkit.getWorld("OlympiadeS3").spawnEntity(loc, EntityType.ENDERMAN);
                 enderman.setGlowing(true);
                 enderman.setCustomName("§cEnderman");
@@ -210,13 +211,13 @@ public class PVETask extends BukkitRunnable implements Listener {
                 blaze.setCustomName("§cBlaze");
                 blaze.setCustomNameVisible(true);
 
-                stray.setGlowing(true);
-                stray.setCustomName("§cStray");
-                stray.setCustomNameVisible(true);
+                piglinBrute.setGlowing(true);
+                piglinBrute.setCustomName("§cPiglin brute");
+                piglinBrute.setCustomNameVisible(true);
 
-                husk.setGlowing(true);
-                husk.setCustomName("§cHusk");
-                husk.setCustomNameVisible(true);
+                piglin.setGlowing(true);
+                piglin.setCustomName("§cpiglin");
+                piglin.setCustomNameVisible(true);
             }
         }
         if (EPVE.getCurrentRound().equals(EPVE.ROUND5)) {
@@ -355,7 +356,7 @@ public class PVETask extends BukkitRunnable implements Listener {
                     }
                     entities -= 1;
                 }
-                if (event.getEntity().getType() == EntityType.WITHER) {
+                if (event.getEntity().getType() == EntityType.WITHER_SKELETON) {
                     if (event.getEntity().getKiller() != null) {
                         Player killer = event.getEntity().getKiller();
                         GameSettings.getPvePodium().put(killer, GameSettings.getPvePodium().get(killer) + 1);
@@ -371,7 +372,7 @@ public class PVETask extends BukkitRunnable implements Listener {
                     }
                     entities -= 1;
                 }
-                if (event.getEntity().getType() == EntityType.WITHER_SKELETON) {
+                if (event.getEntity().getType() == EntityType.WITHER) {
                     if (event.getEntity().getKiller() != null) {
                         Player killer = event.getEntity().getKiller();
                         GameSettings.getPvePodium().put(killer, GameSettings.getPvePodium().get(killer) + 1);
@@ -429,8 +430,8 @@ public class PVETask extends BukkitRunnable implements Listener {
         removeEntityTypes(EntityType.ENDERMAN);
         removeEntityTypes(EntityType.WITHER_SKELETON);
         removeEntityTypes(EntityType.BLAZE);
-        removeEntityTypes(EntityType.STRAY);
-        removeEntityTypes(EntityType.HUSK);
+        removeEntityTypes(EntityType.PIGLIN_BRUTE);
+        removeEntityTypes(EntityType.PIGLIN);
         removeEntityTypes(EntityType.WARDEN);
     }
 
@@ -444,16 +445,18 @@ public class PVETask extends BukkitRunnable implements Listener {
                 player.setGameMode(GameMode.SPECTATOR);
                 player.playSound(player.getLocation(), Sound.ENTITY_MOOSHROOM_CONVERT, 1, 1);
                 dead.add(player);
-                player.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -1080.5, 50, -844.5, -180, 0));
+                player.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -1092.5, 86, -724.5, -180, 0));
             }
         }
     }
 
     private static void reviveDeadPlayer() {
         if (dead.size() > 0) {
-            for (Player player : dead) {
+            Iterator<Player> iterator = dead.iterator();
+            while (iterator.hasNext()) {
+                Player player = iterator.next();
                 equipPlayer(player);
-                dead.remove(player);
+                iterator.remove();
                 player.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -1080.5, 50, -844.5, -180, 0));
                 player.setGameMode(GameMode.SURVIVAL);
                 player.setHealth(20);

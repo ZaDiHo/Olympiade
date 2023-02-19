@@ -62,7 +62,7 @@ public class OlympiadeTask extends BukkitRunnable implements Listener {
             }
 
         }
-        if(!(EGames.getCurrentState() == EGames.PVE)){
+        if(!(EGames.getCurrentState() == EGames.PVP)){
             WorldBorder worldBorder = Bukkit.getWorld("OlympiadeS3").getWorldBorder();
             worldBorder.setSize(999999999);
         }

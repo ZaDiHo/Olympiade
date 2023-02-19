@@ -70,7 +70,7 @@ public class SurpriseTask extends BukkitRunnable implements Listener {
             player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL, 3));
             player.getInventory().addItem(new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1));
 
-            player.getInventory().addItem(new ItemBuilder(Material.STICK).setName("§cCadeau de ZaDiHo ;)").addEnchant(Enchantment.KNOCKBACK, 3).toItemStack());
+            player.getInventory().addItem(new ItemBuilder(Material.STICK).setName("§cCadeau de ZaDiHo ;)").addEnchant(Enchantment.KNOCKBACK, 8).toItemStack());
             player.getInventory().addItem(new ItemStack(Material.ARROW, 64));
             player.getInventory().addItem(new ItemStack(Material.ARROW, 64));
 
@@ -129,6 +129,7 @@ public class SurpriseTask extends BukkitRunnable implements Listener {
     public void run() {
         if (counter == 10) {
             for (Player players : Bukkit.getOnlinePlayers()) {
+                getInSurprise().clear();
                 players.showPlayer(Olympiade.getInstance(), players);
                 getInSurprise().add(players);
                 teleportPlayersCircle(getInSurprise());
