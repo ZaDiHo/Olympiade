@@ -17,6 +17,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
@@ -41,6 +43,7 @@ public class RaceTask extends BukkitRunnable implements Listener {
     private static Cuboid portal2 = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -656, 69, 222.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -662.5, 83, 225.5));
     public static Cuboid endRace = new Cuboid(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -564.5, 45, 270.5), new Location(Bukkit.getWorld("OlympiadeS3_nether"), -570.5, 30, 277.5));
     private static List<Player> inRace = new ArrayList<>();
+    private static HashMap<Player, Location> lastLocation = new HashMap<>();
     private static int counter = 17;
     private static int place = 1;
     public static int time = 0;
@@ -74,13 +77,35 @@ public class RaceTask extends BukkitRunnable implements Listener {
 
     //////////////////////////////////EVENTS//////////////////////////////////
     @EventHandler
+    public static void onLeave(PlayerQuitEvent event){
+            if(EGames.getCurrentState().equals(EGames.RACE)){
+                getInRace().remove(event.getPlayer());
+                totalPlayers--;
+        }
+    }
+
+    @EventHandler
+    public static void onConnect(PlayerJoinEvent event){
+        if(EGames.getCurrentState().equals(EGames.RACE)) {
+            if (!GameSettings.getPvpPodium().contains(event.getPlayer())) {
+                Player player = event.getPlayer();
+                getInRace().remove(player);
+                player.setGameMode(GameMode.SPECTATOR);
+                player.playSound(player.getLocation(), Sound.ENTITY_CAT_HISS, 1, 1);
+                player.sendMessage(GameSettings.prefix + "§cL'épreuve est déjà commencée ! Vous avez été mit en spectateur.");
+                player.teleport(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -882.7, 91.5, 57.0, 90, 0));
+            }
+        }
+    }
+
+    @EventHandler
     public void onDismount(EntityDismountEvent event) {
         event.setCancelled(true);
     }
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
-        if(EGames.getCurrentState().equals(EGames.RACE)){
+        if (EGames.getCurrentState().equals(EGames.RACE)) {
             if (event.getEntityType() == EntityType.STRIDER) {
                 event.setCancelled(true);
             }
@@ -91,7 +116,7 @@ public class RaceTask extends BukkitRunnable implements Listener {
     }
 
     @EventHandler
-    public void onDrop(PlayerDropItemEvent event){
+    public void onDrop(PlayerDropItemEvent event) {
         event.setCancelled(true);
     }
     //////////////////////////////////////////////////////////////////////////////
@@ -99,18 +124,19 @@ public class RaceTask extends BukkitRunnable implements Listener {
     //////////////////////////////////////////////////////RUN///////////////////////////////////////////////////////////
     @Override
     public void run() {
-        if(counter == 17){
-            for(Player players : Bukkit.getOnlinePlayers()){
+        if (counter == 17) {
+            for (Player players : GameSettings.getGamePlayers()) {
                 players.teleport(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -882.7, 91.5, 57.0, 90, 0));
                 players.stopAllSounds();
                 players.playSound(players.getLocation(), Sound.MUSIC_DISC_BLOCKS, 1, 1);
+                players.showPlayer(Olympiade.getInstance(), players);
                 Strider monture = (Strider) players.getWorld().spawnEntity(players.getLocation(), EntityType.STRIDER);
                 monture.setSaddle(true);
                 monture.addPassenger(players);
                 players.getInventory().setItem(4, new ItemBuilder(Material.WARPED_FUNGUS_ON_A_STICK).setName("§6Bâton de course").toItemStack());
-                players.showPlayer(Olympiade.getInstance(), players);
-                players.getActivePotionEffects().clear();
                 getInRace().add(players);
+                players.getActivePotionEffects().clear();
+                totalPlayers++;
             }
         }
         if (counter == 10) {
@@ -158,7 +184,6 @@ public class RaceTask extends BukkitRunnable implements Listener {
 
         }
         if (counter < 0) {
-            totalPlayers = getInRace().size();
             for (Player players : GameSettings.getGamePlayers()) {
                 if (players.isVisualFire()) {
                     players.setVisualFire(false);
@@ -183,23 +208,37 @@ public class RaceTask extends BukkitRunnable implements Listener {
                         getInRace().remove(players);
                         GameSettings.getRacePodium().add(players);
                         Bukkit.broadcastMessage("§a" + players.getName() + " §6a terminé la course à la position §e" + place + " §6! Son chronomètre affichait §e" + Chrono.format(time));
-                        place ++;
+                        place++;
                         Objects.requireNonNull(players.getVehicle()).remove();
                         players.setGameMode(GameMode.SPECTATOR);
                     }
                     getInRace().remove(players);
                 }
             }
-            if (GameSettings.getGamePlayers().size() == GameSettings.getRacePodium().size()) {
+            if (totalPlayers == GameSettings.getRacePodium().size()) {
                 for (Player players : GameSettings.getGamePlayers()) {
-                    players.sendTitle("§cCourse terminée !", "§6Le parcours est terminé !", 10, 20, 10);
+                    players.sendTitle("§cCourse terminée !", "§6Tout le monde a terminé !", 10, 20, 10);
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
                     players.setGameMode(GameMode.ADVENTURE);
-                    EGames.setState(EGames.WAITING);
-                    setPlayed(true);
-                    Cuboid.fillStartRace();
                 }
+                EGames.setState(EGames.WAITING);
+                setPlayed(true);
+                Cuboid.fillStartRace();
+                Game.teleportPodium(GameSettings.getRacePodium());
+                Game.givePoints(GameSettings.getRacePodium());
+                cancel();
+            }
+            if (totalPlayers == 0) {
+                for (Player players : GameSettings.getGamePlayers()) {
+                    players.sendTitle("§cCourse terminée !", "§6Tout le monde a terminé !", 10, 20, 10);
+                    players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
+                    players.getInventory().clear();
+                    players.setGameMode(GameMode.ADVENTURE);
+                }
+                EGames.setState(EGames.WAITING);
+                setPlayed(true);
+                Cuboid.fillStartRace();
                 Game.teleportPodium(GameSettings.getRacePodium());
                 Game.givePoints(GameSettings.getRacePodium());
                 cancel();
@@ -210,10 +249,10 @@ public class RaceTask extends BukkitRunnable implements Listener {
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
                     players.setGameMode(GameMode.ADVENTURE);
-                    EGames.setState(EGames.WAITING);
-                    setPlayed(true);
-                    Cuboid.fillStartRace();
                 }
+                EGames.setState(EGames.WAITING);
+                setPlayed(true);
+                Cuboid.fillStartRace();
                 Game.teleportPodium(GameSettings.getRacePodium());
                 Game.givePoints(GameSettings.getRacePodium());
                 cancel();

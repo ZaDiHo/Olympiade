@@ -32,7 +32,7 @@ public class SpawnCommand implements CommandExecutor {
                 player.playSound(player.getLocation(), Sound.ENTITY_CAT_HISS, 1, 1);
             }
         }
-        return false;
+        return true;
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

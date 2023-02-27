@@ -24,3 +24,5 @@ commands:
     aliases:
       - lobby
       - hub
+  points:
+    description: Commande des points

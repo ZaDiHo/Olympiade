@@ -2,6 +2,7 @@ package fr.zadiho.hepickstudio.olympiade.tasks;
 
 import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
+import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
 import fr.zadiho.hepickstudio.olympiade.utils.ItemBuilder;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -26,6 +27,7 @@ public class SurpriseTask extends BukkitRunnable implements Listener {
     private List<Player> inSurprise = new ArrayList<>();
     private static int counter = 10;
     private static List<Player> team1 = new ArrayList<>();
+    private boolean aliveBoss = true;
 
     public List<Player> getInSurprise() {
         return inSurprise;
@@ -43,7 +45,7 @@ public class SurpriseTask extends BukkitRunnable implements Listener {
             double z = 50 * Math.sin(angle) + centerZ;
             Location location = new Location(Bukkit.getWorlds().get(0), x, centerY, z);
             player.teleport(location);
-            if (player.getName().equalsIgnoreCase("ZaDiHo")) {
+            if (player.getName().equalsIgnoreCase("Kayaato")) {
                 player.teleport(new Location(Bukkit.getWorlds().get(0), -485.5, 66, -1242.5, 90, 0));
             }
         }
@@ -54,7 +56,7 @@ public class SurpriseTask extends BukkitRunnable implements Listener {
         player.getInventory().clear();
         player.setGameMode(GameMode.SURVIVAL);
         ItemStack[] armorContents = new ItemStack[4];
-        if (player.getName().equalsIgnoreCase("ZaDiHo")) {
+        if (player.getName().equalsIgnoreCase("Kayaato")) {
             armorContents[3] = new ItemBuilder(Material.NETHERITE_HELMET).addEnchant(Enchantment.DURABILITY, 5).toItemStack();
             armorContents[2] = new ItemBuilder(Material.NETHERITE_CHESTPLATE).addEnchant(Enchantment.DURABILITY, 5).toItemStack();
             armorContents[1] = new ItemBuilder(Material.NETHERITE_LEGGINGS).addEnchant(Enchantment.DURABILITY, 5).toItemStack();
@@ -95,31 +97,24 @@ public class SurpriseTask extends BukkitRunnable implements Listener {
             if (event.getEntity() instanceof Player) {
                 event.setCancelled(counter > -10);
             }
+
         }
     }
 
     @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event){
-        if(EGames.getCurrentState().equals(EGames.SURPRISE)){
-            if(getInSurprise().contains(event.getEntity().getPlayer())){
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        if (EGames.getCurrentState().equals(EGames.SURPRISE)) {
+            if (getInSurprise().contains(event.getEntity().getPlayer())) {
                 getInSurprise().remove(event.getEntity().getPlayer());
                 event.getDrops().clear();
                 Bukkit.broadcastMessage("§c" + event.getEntity().getName() + " §6est mort ! Il reste §c" + (getInSurprise().size() - 1) + " §6joueurs en vie !");
                 event.getEntity().getPlayer().setGameMode(GameMode.SPECTATOR);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onDeath(EntityDeathEvent event) {
-        if (EGames.getCurrentState().equals(EGames.SURPRISE)) {
-            if (event.getEntity() instanceof Player player) {
-                if (getInSurprise().contains(player)) {
-                    getInSurprise().remove(player);
-                    event.getDrops().clear();
-                    event.setDroppedExp(0);
-                    Bukkit.broadcastMessage("§c" + event.getEntity().getName() + " §6est mort ! Il reste §c" + (getInSurprise().size() - 1) + " §6joueurs en vie !");
-                    player.setGameMode(GameMode.SPECTATOR);
+                event.getEntity().setGameMode(GameMode.SPECTATOR);
+                event.getEntity().teleport(GameSettings.spawn);
+                if(event.getEntity().getName().equalsIgnoreCase("Kayaato")){
+                    aliveBoss = false;
+                }else{
+                    team1.remove(event.getEntity());
                 }
             }
         }
@@ -128,20 +123,21 @@ public class SurpriseTask extends BukkitRunnable implements Listener {
     @Override
     public void run() {
         if (counter == 10) {
-            for (Player players : Bukkit.getOnlinePlayers()) {
-                getInSurprise().clear();
+            aliveBoss = true;
+            getInSurprise().clear();
+            for (Player players : GameSettings.getGamePlayers()) {
                 players.showPlayer(Olympiade.getInstance(), players);
-                getInSurprise().add(players);
-                teleportPlayersCircle(getInSurprise());
-                Bukkit.getWorld("OlympiadeS3").setPVP(false);
                 players.sendTitle("§cAttention !", "§6Epreuve suprise !", 10, 20, 10);
-                if (!players.getName().equalsIgnoreCase("ZaDiHo")) {
+                if (!players.getName().equalsIgnoreCase("Kayaato")) {
                     players.addPotionEffect(PotionEffectType.BLINDNESS.createEffect(999999999, 1));
                 }
                 players.stopAllSounds();
                 players.playSound(players.getLocation(), Sound.MUSIC_DISC_MALL, 1, 1);
                 setup(players);
+                getInSurprise().add(players);
             }
+            teleportPlayersCircle(getInSurprise());
+            Bukkit.getWorld("OlympiadeS3").setPVP(false);
         }
         if (counter == 5) {
             for (Player players : Bukkit.getOnlinePlayers()) {
@@ -174,7 +170,7 @@ public class SurpriseTask extends BukkitRunnable implements Listener {
             }
         }
         if (counter == 0) {
-            Bukkit.broadcastMessage("§cAlors comme ça §eKayato§c tu est indétronable ? §lMontrez lui !");
+            Bukkit.broadcastMessage(GameSettings.prefix + "§cAlors comme ça §eKayato§c tu est indétronable ? §lMontrez lui !");
             for (Player players : Bukkit.getOnlinePlayers()) {
                 players.playSound(players.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
                 players.removePotionEffect(PotionEffectType.BLINDNESS);
@@ -182,44 +178,50 @@ public class SurpriseTask extends BukkitRunnable implements Listener {
 
         }
         if (counter == -5) {
-            Bukkit.broadcastMessage("§cAttention ! La période d'invincibilité est terminée !");
+            Bukkit.broadcastMessage(GameSettings.prefix + "§cAttention ! La période d'invincibilité est terminée !");
             Bukkit.getWorld("OlympiadeS3").setPVP(true);
             for (Player player : getInSurprise()) {
-                if (!player.getName().equalsIgnoreCase("ZaDiHo")) {
+                if (!player.getName().equalsIgnoreCase("Kayaato")) {
                     player.playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1, 1);
                 }
             }
         }
         if (counter < 0) {
-            if (!getInSurprise().contains(Bukkit.getPlayer("ZaDiHo"))) {
-                Bukkit.broadcastMessage("§6Epreuve terminée ! §cKayato §6est mort ! Il reste §c" + (getInSurprise().size()) + " §6joueurs en vie !");
+            if (!aliveBoss) {
+                Bukkit.broadcastMessage(GameSettings.prefix + "§6Epreuve terminée ! §cKayaato §6est mort ! Il reste §c" + (getInSurprise().size()) + " §6joueurs en vie !");
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     player.setGameMode(GameMode.ADVENTURE);
                     WinFireworks.setWinner(player);
                     WinFireworks winFireworks = new WinFireworks();
                     winFireworks.runTaskTimer(Olympiade.getInstance(), 0, 20);
-                    if (player.getName().equalsIgnoreCase("ZaDiHo")) {
+                    if (player.getName().equalsIgnoreCase("Kayaato")) {
                         player.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -468.5, 66, -1239.5, 90, 0));
                     } else {
                         player.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -466.5, 69, -1242.5, 90, 0));
                     }
+                    player.getInventory().clear();
+                    Bukkit.getWorld("OlympiadeS3").setPVP(false);
+                    EGames.setState(EGames.WAITING);
                     cancel();
                 }
             }
-            if (getInSurprise().size() == 1 && getInSurprise().contains(Bukkit.getPlayer("ZaDiHo"))) {
-                Bukkit.broadcastMessage("§6Epreuve terminée ! §cKayato §6est le dernier survivant ! Il est le grand gagnant !");
+            if (team1.size() == 0) {
+                Bukkit.broadcastMessage(GameSettings.prefix + "§6Epreuve terminée ! §cKayaato §6est le dernier survivant ! Il est le grand gagnant !");
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     player.setGameMode(GameMode.ADVENTURE);
                     WinFireworks.setWinner(player);
                     WinFireworks winFireworks = new WinFireworks();
                     winFireworks.runTaskTimer(Olympiade.getInstance(), 0, 20);
-                    if (player.getName().equalsIgnoreCase("ZaDiHo")) {
+                    if (player.getName().equalsIgnoreCase("Kayaato")) {
                         player.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -468.5, 66, -1239.5, 90, 0));
                     } else {
                         player.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -466.5, 69, -1242.5, 90, 0));
                     }
-                    cancel();
+                    player.getInventory().clear();
                 }
+                Bukkit.getWorld("OlympiadeS3").setPVP(false);
+                EGames.setState(EGames.WAITING);
+                cancel();
             }
         }
         counter--;

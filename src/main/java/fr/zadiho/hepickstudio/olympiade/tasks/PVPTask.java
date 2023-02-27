@@ -8,10 +8,13 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -91,6 +94,12 @@ public class PVPTask extends BukkitRunnable implements Listener {
                     Bukkit.broadcastMessage("§c" + player.getName() + " §6est mort ! Il reste §c" + (getInPVP().size()) + " §6joueurs en vie !");
                     player.setGameMode(GameMode.SPECTATOR);
                     GameSettings.getPvpPodium().add(player);
+                    if(alives.size() > 1){
+                        Bukkit.getScheduler().runTaskLater(Olympiade.getInstance(), () -> {
+                            player.teleport(alives.get(0));
+                        }, 10);
+                    }
+
                 }
             }
         }
@@ -118,6 +127,8 @@ public class PVPTask extends BukkitRunnable implements Listener {
                     player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
                 } else if (helmet.getType().equals(Material.DIAMOND_HELMET)) {
                     player.getInventory().setHelmet(new ItemStack(Material.NETHERITE_HELMET));
+                }else{
+                    upgradeStuff(player);
                 }
             }
         }
@@ -128,6 +139,8 @@ public class PVPTask extends BukkitRunnable implements Listener {
                     player.getInventory().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
                 } else if (chestplate.getType().equals(Material.DIAMOND_CHESTPLATE)) {
                     player.getInventory().setChestplate(new ItemStack(Material.NETHERITE_CHESTPLATE));
+                }else{
+                    upgradeStuff(player);
                 }
             }
         }
@@ -138,6 +151,8 @@ public class PVPTask extends BukkitRunnable implements Listener {
                     player.getInventory().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
                 } else if (leggings.getType().equals(Material.DIAMOND_LEGGINGS)) {
                     player.getInventory().setLeggings(new ItemStack(Material.NETHERITE_LEGGINGS));
+                }else{
+                    upgradeStuff(player);
                 }
             }
         }
@@ -148,12 +163,15 @@ public class PVPTask extends BukkitRunnable implements Listener {
                     player.getInventory().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
                 } else if (boots.getType().equals(Material.DIAMOND_BOOTS)) {
                     player.getInventory().setBoots(new ItemStack(Material.NETHERITE_BOOTS));
+                }else{
+                    upgradeStuff(player);
                 }
             }
         }
     }
 
     public static void equipPlayer(Player player) {
+        player.getInventory().clear();
         ItemStack[] armorContents = new ItemStack[4];
         armorContents[3] = new ItemStack(Material.IRON_HELMET);
         armorContents[2] = new ItemStack(Material.IRON_CHESTPLATE);
@@ -165,6 +183,54 @@ public class PVPTask extends BukkitRunnable implements Listener {
         player.getInventory().addItem(new ItemStack(Material.BOW));
         player.getInventory().addItem(new ItemStack(Material.GOLDEN_APPLE, 16));
         player.getInventory().addItem(new ItemStack(Material.ARROW, 32));
+    }
+
+    @EventHandler
+    public static void onLeave(PlayerQuitEvent event){
+        if(!(GameSettings.getPvpPodium().contains(event.getPlayer()))){
+            if(EGames.getCurrentState().equals(EGames.PVP)){
+                if(alives.contains(event.getPlayer())){
+                    alives.remove(event.getPlayer());
+                }
+                getInPVP().remove(event.getPlayer());
+            }
+        }
+    }
+
+    @EventHandler
+    public static void onBlockBreak(BlockBreakEvent event){
+        if(EGames.getCurrentState().equals(EGames.PVP)){
+            if(event.getBlock().getType().equals(Material.GLASS)){
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public static void onConnect(PlayerJoinEvent event){
+        if(EGames.getCurrentState().equals(EGames.PVP)) {
+            if (!GameSettings.getPvpPodium().contains(event.getPlayer())) {
+                Player player = event.getPlayer();
+                if (alives.contains(player)) {
+                    alives.remove(player);
+                }
+                getInPVP().remove(player);
+                player.setGameMode(GameMode.SPECTATOR);
+                player.playSound(player.getLocation(), Sound.ENTITY_CAT_HISS, 1, 1);
+                player.sendMessage(GameSettings.prefix + "§cL'épreuve est déjà commencée ! Vous ne pouvez pas y participer...");
+                player.teleport(alives.get(0).getLocation());
+            } else {
+                Player player = event.getPlayer();
+                if (alives.contains(player)) {
+                    alives.remove(player);
+                }
+                getInPVP().remove(player);
+                player.setGameMode(GameMode.SPECTATOR);
+                player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+                player.sendMessage(GameSettings.prefix + "§cL'épreuve est déjà commencée ! Pas d'inquiétude, vous l'avez déjà terminée !");
+                player.teleport(alives.get(0).getLocation());
+            }
+        }
     }
 
     private static void teleportPlayersCircle(List<Player> players) {
@@ -188,7 +254,7 @@ public class PVPTask extends BukkitRunnable implements Listener {
                 players.showPlayer(Olympiade.getInstance(), players);
                 players.getActivePotionEffects().clear();
                 Bukkit.getWorld("OlympiadeS3").setPVP(false);
-                players.setGameMode(GameMode.SURVIVAL);
+                players.setGameMode(GameMode.ADVENTURE);
                 alives.add(players);
                 getInPVP().add(players);
                 players.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -1803.5, 265, -1435.5, 0, 0));
@@ -236,6 +302,7 @@ public class PVPTask extends BukkitRunnable implements Listener {
                 players.playSound(players.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
                 teleportPlayersCircle(alives);
                 equipPlayer(players);
+                players.setGameMode(GameMode.SURVIVAL);
             }
             WorldBorder worldBorder = Bukkit.getWorld("OlympiadeS3").getWorldBorder();
             worldBorder.setCenter(-1803.5, -1435.5);
@@ -304,8 +371,11 @@ public class PVPTask extends BukkitRunnable implements Listener {
                 getInPVP().remove(alives.get(0));
                 EGames.setState(EGames.WAITING);
                 setPlayed(true);
+                WorldBorder worldBorder = Bukkit.getWorld("OlympiadeS3").getWorldBorder();
+                worldBorder.setSize(999999999);
                 Game.reversedTeleportPodium(GameSettings.getPvpPodium());
                 Game.reversedGivePoints(GameSettings.getPvpPodium());
+                alives.get(0).teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -466.5, 69, -1242.5, 90, 0));
                 cancel();
             }
             if (time / 60 >= EGames.TNT.getDuration()) {

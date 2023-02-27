@@ -6,6 +6,7 @@ import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
 import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
+import fr.zadiho.hepickstudio.olympiade.tasks.FinalTask;
 import fr.zadiho.hepickstudio.olympiade.tasks.PVETask;
 import fr.zadiho.hepickstudio.olympiade.utils.ItemBuilder;
 import org.bukkit.ChatColor;
@@ -114,6 +115,17 @@ public class AdminGUI implements InventoryProvider {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
             SurpriseGUI.INVENTORY.open(player);
         });
+        ClickableItem finalPodium = ClickableItem.of(new ItemBuilder(Material.DIAMOND)
+                .setName(ChatColor.RED + "Podium final")
+                .addLoreLine("§8§m-----------------------")
+                .addLoreLine("§eCliquez téléporter")
+                .addLoreLine("§8§m-----------------------")
+                .toItemStack(), e -> {
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+            FinalTask finalTask = new FinalTask();
+            finalTask.runTaskTimer(Olympiade.getInstance(), 0, 20);
+            EGames.setState(EGames.END);
+        });
 
         ClickableItem leave = ClickableItem.of(new ItemBuilder(Material.SPRUCE_DOOR)
                 .setName(ChatColor.RED + "Fermer")
@@ -121,6 +133,7 @@ public class AdminGUI implements InventoryProvider {
             player.closeInventory();
         });
 
+        contents.set(2, 0, finalPodium);
         contents.set(0, 4, player_head_item);
         contents.set(2, 2, jump);
         contents.set(2, 3, race);

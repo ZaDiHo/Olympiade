@@ -18,10 +18,21 @@ public class PlayerJoin implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
+        event.setJoinMessage(null);
+        Bukkit.broadcastMessage("§7(§a§l»§7) §f" + Game.getPlayerPrefix(player) + player.getName());
+        PlayerManager.registerPlayer(player);
+        //player.setResourcePack();
+        ScoreboardManager.createScoreboard(player);
+        player.sendTitle("§c§lOlympiade III", "§fBienvenue " + Game.getPlayerPrefix(player) + player.getName());
         if(EGames.getCurrentState() == EGames.WAITING){
-            event.setJoinMessage(null);
-            Bukkit.broadcastMessage("§7(§a§l»§7) §f" + Game.getPlayerPrefix(player) + player.getName());
-            player.sendTitle("§c§lOlympiade III", "§fBienvenue " + Game.getPlayerPrefix(player) + player.getName());
+            player.sendMessage("§8§m----------------------------------------");
+            player.sendMessage("§7Bienvenue sur §c§lOlympiade III");
+            player.sendMessage("");
+            player.sendMessage("§fTu es actuellement dans la §cphase de d'attente§f de lancement.");
+            player.sendMessage("§fNous éspérons que tu iras jusqu'au bout de cette aventure !");
+            player.sendMessage("");
+            player.sendMessage("§7(Si tu es bloqué dans le spawn, tu peux utiliser §6§l/§espawn §7!)");
+            player.sendMessage("§8§m----------------------------------------");
             player.setGameMode(GameMode.ADVENTURE);
             player.setHealth(20);
             player.playSound(player.getLocation(), Sound.ENTITY_MOOSHROOM_CONVERT, 1, 1);
@@ -33,8 +44,7 @@ public class PlayerJoin implements Listener {
                 player.setAllowFlight(true);
             }
             player.playSound(player.getLocation(), Sound.MUSIC_DISC_11, 1, 1);
-            PlayerManager.registerPlayer(player);
-            ScoreboardManager.createScoreboard(player);
+
         }
     }
 }

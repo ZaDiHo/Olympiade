@@ -1,8 +1,10 @@
 package fr.zadiho.hepickstudio.olympiade.game;
 
+import fr.zadiho.hepickstudio.olympiade.Olympiade;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -59,6 +61,28 @@ public class GameSettings {
     }
 
     //------------------
+    public static void loadPodium() {
+        ConfigurationSection podiumSection = Olympiade.getInstance().getConfig().getConfigurationSection("podium");
+        if (podiumSection != null) {
+            for (String playerName : podiumSection.getKeys(false)) {
+                Player player = Bukkit.getPlayerExact(playerName);
+                if (player != null) {
+                    podium.put(player, podiumSection.getInt(playerName));
+                }
+            }
+        }
+    }
+
+    public static void savePodium() {
+        ConfigurationSection podiumSection = Olympiade.getInstance().getConfig().createSection("podium");
+        for (Map.Entry<Player, Integer> entry : podium.entrySet()) {
+            Player player = entry.getKey();
+            Integer points = entry.getValue();
+            podiumSection.set(player.getName(), points);
+        }
+        Olympiade.getInstance().saveConfig();
+    }
+
     public static List<Player> getRacePodium() {
         return racePodium;
     }

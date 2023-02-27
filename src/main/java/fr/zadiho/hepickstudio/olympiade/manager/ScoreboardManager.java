@@ -35,7 +35,7 @@ public class ScoreboardManager {
                     "§8■ §fÉpreuve §7➢ §cEn attente...",
                     "§8■ §fJoueurs §7➢ §e" + GameSettings.getGamePlayers().size(),
                     "§7§m------------------",
-                    "§6play.olympiade.fr"
+                    "§6olympiade.hepickstudio.fr"
             );
         }
         if (EGames.getCurrentState() == EGames.SURPRISE) {
@@ -48,7 +48,7 @@ public class ScoreboardManager {
                     "§8■ §fÉpreuve §7➢ §cSURPRISE !",
                     "§8■ §fJoueurs §7➢ §e" + GameSettings.getGamePlayers().size(),
                     "§7§m------------------",
-                    "§6play.olympiade.fr"
+                    "§6olympiade.hepickstudio.fr"
             );
         }
         if (EGames.getCurrentState() == EGames.RACE) {
@@ -62,7 +62,7 @@ public class ScoreboardManager {
                     "§8■ §fChrono §7➢ §e" + Chrono.format(RaceTask.time),
                     "§8■ §fJoueurs §7➢ §e" + GameSettings.getGamePlayers().size(),
                     "§7§m------------------",
-                    "§6play.olympiade.fr"
+                    "§6olympiade.hepickstudio.fr"
             );
         }
         if (EGames.getCurrentState() == EGames.PARKOUR) {
@@ -76,7 +76,7 @@ public class ScoreboardManager {
                     "§8■ §fChrono §7➢ §e" + Chrono.format(JumpTask.time),
                     "§8■ §fJoueurs §7➢ §e" + GameSettings.getGamePlayers().size(),
                     "§7§m------------------",
-                    "§6play.olympiade.fr"
+                    "§6olympiade.hepickstudio.fr"
             );
         }
         if (EGames.getCurrentState() == EGames.TNT) {
@@ -90,7 +90,7 @@ public class ScoreboardManager {
                     "§8■ §fVivants §7➢ §e" + TNTTask.alives.size(),
                     "§8■ §fJoueurs §7➢ §e" + GameSettings.getGamePlayers().size(),
                     "§7§m------------------",
-                    "§6play.olympiade.fr"
+                    "§6olympiade.hepickstudio.fr"
             );
         }
         if (EGames.getCurrentState() == EGames.PVP) {
@@ -104,7 +104,7 @@ public class ScoreboardManager {
                     "§8■ §fVivants §7➢ §e" + PVPTask.alives.size(),
                     "§8■ §fJoueurs §7➢ §e" + GameSettings.getGamePlayers().size(),
                     "§7§m------------------",
-                    "§6play.olympiade.fr"
+                    "§6olympiade.hepickstudio.fr"
             );
         }
 
@@ -115,12 +115,12 @@ public class ScoreboardManager {
                     "§8■ §fCompte §7➢ §6" + player.getName(),
                     "§8■ §fPoints §7➢ §6" + GameSettings.getPodium().get(player),
                     "",
-                    "§8■ §fÉpreuve §7➢ §cPVP",
+                    "§8■ §fÉpreuve §7➢ §cPVE",
                     "§8■ §fRestant §7➢ §e" + PVETask.entities,
                     "§8■ §fVague §7➢ §e" + EPVE.getCurrentRound().getName(),
                     "§8■ §fJoueurs §7➢ §e" + GameSettings.getGamePlayers().size(),
                     "§7§m------------------",
-                    "§6play.olympiade.fr"
+                    "§6olympiade.hepickstudio.fr"
             );
         }
     }

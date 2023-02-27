@@ -2,6 +2,7 @@ package fr.zadiho.hepickstudio.olympiade;
 
 import fr.minuskube.inv.InventoryManager;
 import fr.zadiho.hepickstudio.olympiade.game.EGames;
+import fr.zadiho.hepickstudio.olympiade.game.GameSettings;
 import fr.zadiho.hepickstudio.olympiade.manager.RegistrationManager;
 import fr.zadiho.hepickstudio.olympiade.tasks.OlympiadeTask;
 import fr.zadiho.hepickstudio.olympiade.tasks.TNTTask;
@@ -46,6 +47,7 @@ public final class Olympiade extends JavaPlugin {
 
         }
 
+        GameSettings.loadPodium();
         TNTTask.fillFloors();
         Holograms.clearHolograms();
         Holograms.setupHolograms();

@@ -43,8 +43,10 @@ public class Game {
 
     ////////////////////////////////////////PODIUM/////////////////////////////////////////
     public static void teleportPodium(List<Player> podium) {
-        for (Player player : podium) {
+        for(Player player : Bukkit.getOnlinePlayers()){
             player.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -477.5, 64, -1242.5, -90, 0));
+        }
+        for (Player player : podium) {
             if (podium.size() >= 1){
                 podium.get(0).teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -466.5, 69, -1242.5, 90, 0));
                 WinFireworks.setWinner(podium.get(0));
@@ -58,14 +60,17 @@ public class Game {
                 podium.get(2).teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -468.5, 66, -1239.5, 90, 0));
             }
         }
+
     }
 
     public static void reversedTeleportPodium(List<Player> podium) {
         Collections.reverse(podium);
         System.out.println(podium);
+        for(Player player : Bukkit.getOnlinePlayers()){
+            player.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -477.5, 64, -1242.5, -90, 0));
+        }
         for (int i = 0; i < podium.size(); i++) {
             Player player = podium.get(i);
-            player.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -477.5, 64, -1242.5, -90, 0));
             if (podium.size() >= 1 && i == 0){
                 player.teleport(new Location(Bukkit.getWorld("OlympiadeS3"), -466.5, 69, -1242.5, 90, 0));
                 WinFireworks.setWinner(player);
@@ -82,20 +87,17 @@ public class Game {
     }
 
     public static void reversedGivePoints(List<Player> podium) {
-        Collections.reverse(podium); // On inverse l'ordre de la liste
-        System.out.println(podium);
         for (int i = 0; i < podium.size(); i++) {
-            Player player = podium.get(i);
             if (i == 0) {
-                addPoints(player, 10);
+                addPoints(podium.get(i), 10);
             } else if (i == 1) {
-                addPoints(player, 8);
+                addPoints(podium.get(i), 8);
             } else if (i == 2) {
-                addPoints(player, 6);
+                addPoints(podium.get(i), 6);
             } else if (i >= 3 && i < 10) {
-                addPoints(player, 5);
+                addPoints(podium.get(i), 5);
             } else {
-                addPoints(player, 2);
+                addPoints(podium.get(i), 2);
             }
         }
     }

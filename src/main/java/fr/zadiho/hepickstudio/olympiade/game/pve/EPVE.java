@@ -4,11 +4,11 @@ import fr.zadiho.hepickstudio.olympiade.game.EGames;
 
 public enum EPVE {
 
-    ROUND1("Vague 1",1, 10),
-    ROUND2("Vague 2",2, 10),
-    ROUND3("Vague 3",3, 10),
-    ROUND4("Vague 4",4, 10),
-    ROUND5("Vague 5",5, 10);
+    ROUND1("Vague 1",1, 200),
+    ROUND2("Vague 2",2, 150),
+    ROUND3("Vague 3",3, 150),
+    ROUND4("Vague 4",4, 100),
+    ROUND5("Vague 5",5, 25);
 
     private final String name;
     private final Integer entities;

@@ -17,7 +17,9 @@ public enum EGames {
     PVE("PvE", 20),
     TNT("TNT Run", 10),
     PVP("FFA", 15),
-    SURPRISE("Surprise", -1);
+    SURPRISE("Surprise", -1),
+
+    END("Fin", -1);
     /////////////////////////////////////////////////////////////
 
     ///////////////////////GAME VARIABLES////////////////////////

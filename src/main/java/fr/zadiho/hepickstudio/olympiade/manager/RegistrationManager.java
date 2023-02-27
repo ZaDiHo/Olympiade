@@ -1,8 +1,8 @@
 package fr.zadiho.hepickstudio.olympiade.manager;
 
 import fr.zadiho.hepickstudio.olympiade.Olympiade;
-import fr.zadiho.hepickstudio.olympiade.commands.GameCommand;
 import fr.zadiho.hepickstudio.olympiade.commands.HostCommand;
+import fr.zadiho.hepickstudio.olympiade.commands.PointsCommand;
 import fr.zadiho.hepickstudio.olympiade.commands.SpawnCommand;
 import fr.zadiho.hepickstudio.olympiade.listeners.GeneralEvents;
 import fr.zadiho.hepickstudio.olympiade.listeners.PlayerJoin;
@@ -24,9 +24,9 @@ public class RegistrationManager {
 
     public void registration(){
 
-        Objects.requireNonNull(main.getCommand("game")).setExecutor(new GameCommand());
         Objects.requireNonNull(main.getCommand("host")).setExecutor(new HostCommand());
         Objects.requireNonNull(main.getCommand("spawn")).setExecutor(new SpawnCommand());
+        Objects.requireNonNull(main.getCommand("points")).setExecutor(new PointsCommand());
 
         this.listeners.add(new PlayerJoin());
         this.listeners.add(new PlayerQuit());

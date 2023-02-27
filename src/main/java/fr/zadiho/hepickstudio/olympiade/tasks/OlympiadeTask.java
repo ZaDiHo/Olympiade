@@ -46,14 +46,16 @@ public class OlympiadeTask extends BukkitRunnable implements Listener {
             return;
         }
         if (event.getPlayer().getItemInHand().getItemMeta().getDisplayName().equals("§8» §eHost")) {
-            AdminGUI.SMART_INVENTORY.open(event.getPlayer());
+            if(player.hasPermission("olympiade.staff")){
+                AdminGUI.SMART_INVENTORY.open(event.getPlayer());
+            }
         }
     }
 
     @Override
     public void run() {
         for(Player players : GameSettings.getGamePlayers()){
-            if((EGames.getCurrentState() == EGames.WAITING || EGames.getCurrentState() == EGames.PVE && !(GameSettings.getHostPlayers().contains(players)))){
+            if((EGames.getCurrentState() == EGames.WAITING && !(GameSettings.getHostPlayers().contains(players)))){
                 players.setVisualFire(false);
                 players.showPlayer(Olympiade.getInstance(), players);
                 if(!(players.getGameMode() == GameMode.ADVENTURE)){
@@ -85,7 +87,6 @@ public class OlympiadeTask extends BukkitRunnable implements Listener {
                 players.getActivePotionEffects().clear();
                 players.setGlowing(false);
             }
-            PlayerManager.registerPlayer(players);
             PlayerManager.hostItem(players);
 
             players.setPlayerListHeader("\n" +

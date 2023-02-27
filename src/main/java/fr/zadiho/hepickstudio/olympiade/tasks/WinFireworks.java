@@ -36,7 +36,7 @@ public class WinFireworks extends BukkitRunnable {
 
         fm.setPower(1);
         f.setFireworkMeta(fm);
-        if(timer == 0){
+        if (timer == 0) {
             cancel();
         }
 

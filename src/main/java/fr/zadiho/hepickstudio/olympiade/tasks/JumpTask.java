@@ -16,6 +16,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -40,7 +42,7 @@ public class JumpTask extends BukkitRunnable implements Listener {
     public static void resetRace(){
         setPlayed(false);
         totalPlayers = 0;
-        counter = 10;
+        counter = 20;
         time = 0;
         place = 1;
         GameSettings.getJumpPodium().clear();
@@ -48,6 +50,31 @@ public class JumpTask extends BukkitRunnable implements Listener {
         checkPoints.clear();
         hidePlayer.clear();
     }
+
+    @EventHandler
+    public static void onLeave(PlayerQuitEvent event){
+            if(EGames.getCurrentState().equals(EGames.PARKOUR)){
+                getInJump().remove(event.getPlayer());
+                totalPlayers--;
+
+        }
+    }
+
+    @EventHandler
+    public static void onConnect(PlayerJoinEvent event){
+        if(EGames.getCurrentState().equals(EGames.PARKOUR)) {
+            if (!GameSettings.getPvpPodium().contains(event.getPlayer())) {
+                Player player = event.getPlayer();
+                    getInJump().remove(player);
+                player.setGameMode(GameMode.SPECTATOR);
+                player.playSound(player.getLocation(), Sound.ENTITY_CAT_HISS, 1, 1);
+                player.sendMessage(GameSettings.prefix + "§cL'épreuve est déjà commencée ! Vous avez été mit en spectateur.");
+                player.teleport(new Location(Bukkit.getWorld("OlympiadeS3_nether"), -1147.5, 67, 41.5, -90, 0));
+            }
+        }
+    }
+
+
 
     private static void resetCheckpoint(Player player) {
         if(checkPoints.get(player) == 1){
@@ -66,39 +93,42 @@ public class JumpTask extends BukkitRunnable implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event){
-        Player player = event.getPlayer();
-        if(event.getItem() == null){
-            return;
-        }
-        if(player.getItemInHand() == null){
-            return;
-        }
-        if(player.getItemInHand().getItemMeta().getDisplayName().equals("§6Retour au checkpoint")){
-            resetCheckpoint(player);
-            player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1, 1);
-        }
-        if(player.getItemInHand().getItemMeta().getDisplayName().equals("§6Masquer les joueurs")){
-            if(hidePlayer.get(player)){
-                hidePlayer.remove(player);
-                hidePlayer.put(player, false);
-                player.sendMessage("§cVous avez affiché les joueurs.");
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                player.getInventory().setItem(8, new ItemBuilder(Material.LIGHT_BLUE_DYE).setName("§6Masquer les joueurs").toItemStack());
-                for(Player players : GameSettings.getGamePlayers()){
-                    player.showPlayer(Olympiade.getInstance(), players);
-                }
-            }else{
-                hidePlayer.remove(player);
-                hidePlayer.put(player, true);
-                player.sendMessage("§aVous avez masqué les joueurs.");
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
-                player.getInventory().setItem(8, new ItemBuilder(Material.RED_DYE).setName("§6Masquer les joueurs").toItemStack());
-                for(Player players : GameSettings.getGamePlayers()){
-                    player.hidePlayer(Olympiade.getInstance(), players);
-                }
+        if(EGames.getCurrentState().equals(EGames.PARKOUR)){
+            Player player = event.getPlayer();
+            if(event.getItem() == null){
+                return;
             }
+            if(player.getItemInHand() == null){
+                return;
+            }
+            if(player.getItemInHand().getItemMeta().getDisplayName().equals("§6Retour au checkpoint")){
+                resetCheckpoint(player);
+                player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1, 1);
+            }
+            if(player.getItemInHand().getItemMeta().getDisplayName().equals("§6Masquer les joueurs")){
+                if(hidePlayer.get(player)){
+                    hidePlayer.remove(player);
+                    hidePlayer.put(player, false);
+                    player.sendMessage("§cVous avez affiché les joueurs.");
+                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                    player.getInventory().setItem(8, new ItemBuilder(Material.LIGHT_BLUE_DYE).setName("§6Masquer les joueurs").toItemStack());
+                    for(Player players : GameSettings.getGamePlayers()){
+                        player.showPlayer(Olympiade.getInstance(), players);
+                    }
+                }else{
+                    hidePlayer.remove(player);
+                    hidePlayer.put(player, true);
+                    player.sendMessage("§aVous avez masqué les joueurs.");
+                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+                    player.getInventory().setItem(8, new ItemBuilder(Material.RED_DYE).setName("§6Masquer les joueurs").toItemStack());
+                    for(Player players : GameSettings.getGamePlayers()){
+                        player.hidePlayer(Olympiade.getInstance(), players);
+                    }
+                }
 
+            }
         }
+
     }
 
     public static boolean isPlayed() {
@@ -123,8 +153,9 @@ public class JumpTask extends BukkitRunnable implements Listener {
     public void run() {
         if (counter == 20) {
             Cuboid.fillStartJump();
+            EPVE.setCurrentRound(EPVE.ROUND1);
             for (Player players : Bukkit.getOnlinePlayers()) {
-                EPVE.setCurrentRound(EPVE.ROUND1);
+                totalPlayers++;
                 hidePlayer.put(players, false);
                 getInJump().add(players);
                 checkPoints.put(players, 1);
@@ -178,7 +209,7 @@ public class JumpTask extends BukkitRunnable implements Listener {
 
         }
         if (counter < 0) {
-            for (Player players : GameSettings.getGamePlayers()) {
+            for (Player players : getInJump()) {
                 if (players.isVisualFire()) {
                     players.setVisualFire(false);
                 }
@@ -207,23 +238,24 @@ public class JumpTask extends BukkitRunnable implements Listener {
                         GameSettings.getJumpPodium().add(players);
                         Bukkit.broadcastMessage("§a" + players.getName() + " §6a terminé le jump à la position §e" + (place) + " §6! Son chronomètre affichait §e" + Chrono.format(time));
                         place ++;
+
                         getInJump().remove(players);
                         players.setGameMode(GameMode.SPECTATOR);
                     }
                 }
             }
-            if(GameSettings.getGamePlayers().size() == GameSettings.getJumpPodium().size()){
+            if(totalPlayers == GameSettings.getJumpPodium().size()){
                 for (Player players : GameSettings.getGamePlayers()) {
                     players.sendTitle("§cTout le monde à terminé !", "§6Le parcours est terminé !", 10, 20, 10);
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
-                    EGames.setState(EGames.WAITING);
                     players.setGameMode(GameMode.ADVENTURE);
-                    setPlayed(true);
-                    Cuboid.fillStartJump();
                     players.showPlayer(Olympiade.getInstance(), players);
                     players.getActivePotionEffects().clear();
                 }
+                EGames.setState(EGames.WAITING);
+                setPlayed(true);
+                Cuboid.fillStartJump();
                 Game.teleportPodium(GameSettings.getJumpPodium());
                 Game.givePoints(GameSettings.getJumpPodium());
                 hidePlayer.clear();
@@ -234,13 +266,12 @@ public class JumpTask extends BukkitRunnable implements Listener {
                     players.sendTitle("§cTemps écoulé !", "§6Le parcours est terminé !", 10, 20, 10);
                     players.playSound(players.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 1);
                     players.getInventory().clear();
-                    EGames.setState(EGames.WAITING);
                     players.setGameMode(GameMode.ADVENTURE);
-                    setPlayed(true);
-                    Cuboid.fillStartJump();
                     players.showPlayer(Olympiade.getInstance(), players);
                     players.getActivePotionEffects().clear();
                 }
+                setPlayed(true);
+                Cuboid.fillStartJump();
                 Game.teleportPodium(GameSettings.getJumpPodium());
                 Game.givePoints(GameSettings.getJumpPodium());
                 hidePlayer.clear();
